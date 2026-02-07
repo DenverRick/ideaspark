@@ -337,9 +337,20 @@
                 </div>
             </div>
 
-            <div id="detail-reference-urls" class="detail-reference-urls hidden">
-                <h3>Reference Links</h3>
+            <div id="detail-reference-urls" class="detail-reference-urls">
+                <div class="reference-header">
+                    <h3>Reference Links</h3>
+                    <button class="btn btn-small btn-secondary" id="add-reference-btn">+ Add Link</button>
+                </div>
                 <ul id="detail-reference-list" class="reference-list"></ul>
+                <div id="add-reference-section" class="hidden" style="margin-top: 8px;">
+                    <div style="display: flex; gap: 8px;">
+                        <input type="url" id="new-reference-url" placeholder="https://example.com" style="flex: 1; padding: 8px 12px; font-size: 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: inherit;">
+                        <button class="btn btn-small btn-primary" id="save-reference-btn">Save</button>
+                        <button class="btn btn-small btn-secondary" id="cancel-reference-btn">Cancel</button>
+                    </div>
+                </div>
+                <p id="no-references-text" class="hidden" style="font-size: 13px; color: var(--text-lighter); font-style: italic; margin-top: 4px;">No reference links yet.</p>
             </div>
 
             <div class="detail-meta">

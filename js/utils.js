@@ -8,6 +8,7 @@ function showView(viewName) {
 
 // Toast notifications
 let toastTimeout = null;
+let toastFadeTimeout = null;
 function showToast(message, type = 'error') {
     let toast = document.getElementById('toast');
     if (!toast) {
@@ -15,10 +16,22 @@ function showToast(message, type = 'error') {
         toast.id = 'toast';
         document.body.appendChild(toast);
     }
+    // Clear any existing timeouts
+    clearTimeout(toastTimeout);
+    clearTimeout(toastFadeTimeout);
+
     toast.textContent = message;
     toast.className = `toast toast-${type} toast-show`;
-    clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(() => toast.classList.remove('toast-show'), 4000);
+
+    // Auto-dismiss: success/info 3s, error 5s
+    const duration = (type === 'error') ? 5000 : 3000;
+    toastTimeout = setTimeout(() => {
+        toast.classList.remove('toast-show');
+        // Fully hide after transition completes
+        toastFadeTimeout = setTimeout(() => {
+            toast.className = 'toast';
+        }, 350);
+    }, duration);
 }
 
 function formatDate(dateStr) {

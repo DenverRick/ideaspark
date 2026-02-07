@@ -59,6 +59,29 @@ const IdeaDetail = {
             if (this.speechInput) this.speechInput.stop();
         });
 
+        // Reference links management
+        document.getElementById('add-reference-btn').addEventListener('click', () => {
+            document.getElementById('add-reference-section').classList.remove('hidden');
+            document.getElementById('new-reference-url').value = '';
+            document.getElementById('new-reference-url').focus();
+        });
+
+        document.getElementById('cancel-reference-btn').addEventListener('click', () => {
+            document.getElementById('add-reference-section').classList.add('hidden');
+            document.getElementById('new-reference-url').value = '';
+        });
+
+        document.getElementById('save-reference-btn').addEventListener('click', () => {
+            this.addReferenceLink();
+        });
+
+        document.getElementById('new-reference-url').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.addReferenceLink();
+            }
+        });
+
         // Summarize video in detail view
         document.getElementById('detail-summarize-btn').addEventListener('click', () => {
             this.summarizeVideo();
@@ -113,29 +136,9 @@ const IdeaDetail = {
             videoSection.classList.add('hidden');
         }
 
-        // Reference URLs
-        const refUrlsContainer = document.getElementById('detail-reference-urls');
-        const refUrlsList = document.getElementById('detail-reference-list');
-        if (f.ReferenceURLs && f.ReferenceURLs.trim()) {
-            const urls = f.ReferenceURLs.trim().split('\n').filter(u => u.trim());
-            if (urls.length > 0) {
-                refUrlsContainer.classList.remove('hidden');
-                refUrlsList.innerHTML = urls.map(url => {
-                    const trimmed = url.trim();
-                    let displayText = trimmed;
-                    try {
-                        const parsed = new URL(trimmed);
-                        displayText = parsed.hostname + (parsed.pathname !== '/' ? parsed.pathname : '');
-                        if (displayText.length > 50) displayText = displayText.substring(0, 47) + '...';
-                    } catch (e) { /* not a valid URL, show raw text */ }
-                    return `<li><a href="${escapeHtml(trimmed)}" target="_blank" rel="noopener noreferrer">${escapeHtml(displayText)}</a></li>`;
-                }).join('');
-            } else {
-                refUrlsContainer.classList.add('hidden');
-            }
-        } else {
-            refUrlsContainer.classList.add('hidden');
-        }
+        // Reference URLs - always show section, render links with delete buttons
+        document.getElementById('add-reference-section').classList.add('hidden');
+        this.renderReferenceLinks();
 
         // Category, Status & Priority selects
         document.getElementById('detail-category').value = f.Category || 'General';
@@ -214,6 +217,7 @@ const IdeaDetail = {
             if (currentIdeaData) {
                 currentIdeaData.fields[field] = value;
             }
+            showToast(`${field} updated`, 'success');
         } catch (error) {
             showToast('Failed to update: ' + error.message, 'error');
         }
@@ -247,6 +251,98 @@ const IdeaDetail = {
         } catch (error) {
             showToast('Failed to save thoughts', 'error');
         }
+    },
+
+    async addReferenceLink() {
+        const input = document.getElementById('new-reference-url');
+        const url = input.value.trim();
+        if (!url) {
+            showToast('Please enter a URL', 'error');
+            return;
+        }
+
+        // Basic URL validation
+        try {
+            new URL(url);
+        } catch (e) {
+            showToast('Please enter a valid URL (include https://)', 'error');
+            return;
+        }
+
+        const existing = currentIdeaData?.fields?.ReferenceURLs || '';
+        const updated = existing ? `${existing}\n${url}` : url;
+
+        try {
+            await AirtableAPI.updateIdea(currentIdeaId, { ReferenceURLs: updated });
+            if (currentIdeaData) {
+                currentIdeaData.fields.ReferenceURLs = updated;
+            }
+            input.value = '';
+            document.getElementById('add-reference-section').classList.add('hidden');
+            this.renderReferenceLinks();
+            showToast('Link added', 'success');
+        } catch (error) {
+            showToast('Failed to add link: ' + error.message, 'error');
+        }
+    },
+
+    async removeReferenceLink(index) {
+        const existing = currentIdeaData?.fields?.ReferenceURLs || '';
+        const urls = existing.trim().split('\n').filter(u => u.trim());
+        urls.splice(index, 1);
+        const updated = urls.join('\n') || null;
+
+        try {
+            await AirtableAPI.updateIdea(currentIdeaId, { ReferenceURLs: updated || '' });
+            if (currentIdeaData) {
+                currentIdeaData.fields.ReferenceURLs = updated || '';
+            }
+            this.renderReferenceLinks();
+            showToast('Link removed', 'success');
+        } catch (error) {
+            showToast('Failed to remove link: ' + error.message, 'error');
+        }
+    },
+
+    renderReferenceLinks() {
+        const refUrlsList = document.getElementById('detail-reference-list');
+        const noRefsText = document.getElementById('no-references-text');
+        const refs = currentIdeaData?.fields?.ReferenceURLs;
+
+        if (refs && refs.trim()) {
+            const urls = refs.trim().split('\n').filter(u => u.trim());
+            if (urls.length > 0) {
+                noRefsText.classList.add('hidden');
+                refUrlsList.innerHTML = urls.map((url, idx) => {
+                    const trimmed = url.trim();
+                    let displayText = trimmed;
+                    try {
+                        const parsed = new URL(trimmed);
+                        displayText = parsed.hostname + (parsed.pathname !== '/' ? parsed.pathname : '');
+                        if (displayText.length > 50) displayText = displayText.substring(0, 47) + '...';
+                    } catch (e) { /* not a valid URL, show raw text */ }
+                    return `<li>
+                        <a href="${escapeHtml(trimmed)}" target="_blank" rel="noopener noreferrer">${escapeHtml(displayText)}</a>
+                        <button class="ref-delete-btn" data-ref-index="${idx}" aria-label="Remove link">&times;</button>
+                    </li>`;
+                }).join('');
+
+                // Attach delete handlers
+                refUrlsList.querySelectorAll('.ref-delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const idx = parseInt(btn.dataset.refIndex);
+                        if (confirm('Remove this reference link?')) {
+                            this.removeReferenceLink(idx);
+                        }
+                    });
+                });
+                return;
+            }
+        }
+
+        refUrlsList.innerHTML = '';
+        noRefsText.classList.remove('hidden');
     },
 
     async confirmDelete() {

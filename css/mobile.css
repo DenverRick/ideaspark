@@ -111,21 +111,11 @@ input, textarea, select {
 
 /* ========== Desktop (>= 1024px) ========== */
 @media (min-width: 1024px) {
-    /* Constrain header and filter bar to match content */
-    .app-header {
-        max-width: 960px;
-        margin: 0 auto;
-        width: 100%;
-        border-bottom: none;
-        box-shadow: 0 1px 0 var(--border);
-    }
-
-    .filter-bar {
-        max-width: 960px;
-        margin: 0 auto;
-        width: 100%;
-        border-bottom: none;
-        box-shadow: 0 1px 0 var(--border);
+    /* Dashboard: center header and filter bar via inner padding */
+    [data-view="dashboard"] .app-header,
+    [data-view="dashboard"] .filter-bar {
+        padding-left: calc(50% - 480px + 16px);
+        padding-right: calc(50% - 480px + 16px);
     }
 
     /* Two-column card layout */
@@ -137,6 +127,7 @@ input, textarea, select {
         align-content: flex-start;
         padding: 20px 16px;
         padding-bottom: 80px;
+        margin: 0 auto;
     }
 
     .idea-card {
@@ -180,11 +171,52 @@ input, textarea, select {
         -webkit-box-orient: vertical;
     }
 
-    /* Detail view: wider panels */
+    /* Detail view: center header via inner padding */
+    [data-view="idea-detail"] .app-header {
+        padding-left: calc(50% - 400px + 16px);
+        padding-right: calc(50% - 400px + 16px);
+    }
+
+    /* Detail view: constrain content */
     .tab-content {
         max-width: 800px;
         margin: 0 auto;
         width: 100%;
+    }
+
+    /* Detail view: card-like sections on desktop */
+    .tab-panel[data-tab="details"] {
+        padding: 20px 16px;
+        gap: 16px;
+        background: var(--bg);
+    }
+
+    .detail-video-wrapper {
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        overflow: hidden;
+    }
+
+    .detail-reference-urls {
+        background: var(--bg-white);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        padding: 16px 20px;
+    }
+
+    .detail-meta {
+        background: var(--bg-white);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        padding: 4px 20px;
+    }
+
+    .detail-thoughts {
+        background: var(--bg-white);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        padding: 20px;
     }
 
     /* Chat messages wider */
@@ -208,12 +240,22 @@ input, textarea, select {
     .fab {
         right: calc(50% - 480px + 20px);
     }
+
+    /* Idea form: center header */
+    [data-view="idea-form"] .app-header {
+        padding-left: calc(50% - 320px + 16px);
+        padding-right: calc(50% - 320px + 16px);
+    }
 }
 
 /* ========== Wide Desktop (>= 1440px) ========== */
 @media (min-width: 1440px) {
-    .app-header,
-    .filter-bar,
+    [data-view="dashboard"] .app-header,
+    [data-view="dashboard"] .filter-bar {
+        padding-left: calc(50% - 550px + 16px);
+        padding-right: calc(50% - 550px + 16px);
+    }
+
     .dashboard-content {
         max-width: 1100px;
     }
