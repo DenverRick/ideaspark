@@ -47,6 +47,14 @@ Format your response with markdown headers (### ) and bullet points for easy rea
                 throw new Error('Gemini API key error. Check that your key is valid at aistudio.google.com/apikey');
             }
 
+            // Rate limit / quota exceeded (HTTP 429 or quota message)
+            if (response.status === 429 || message.toLowerCase().includes('quota')) {
+                // Try to extract retry delay from message
+                const retryMatch = message.match(/retry in ([\d.]+)s/i);
+                const retrySec = retryMatch ? Math.ceil(parseFloat(retryMatch[1])) : 60;
+                throw new Error(`RATE_LIMIT:${retrySec}:Free-tier quota reached. Wait ~${retrySec}s and tap "Try Again". Video summarization uses many tokens — if this happens often, upgrade at ai.google.dev/pricing.`);
+            }
+
             throw new Error(message);
         }
 

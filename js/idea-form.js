@@ -258,7 +258,40 @@ const IdeaForm = {
 
             } catch (error) {
                 console.error('Gemini summary error:', error);
-                // If Gemini fails, show error with option to try again
+
+                // Handle rate limit with countdown timer
+                if (error.message.startsWith('RATE_LIMIT:')) {
+                    const parts = error.message.split(':');
+                    const waitSec = parseInt(parts[1]) || 60;
+                    const userMsg = parts.slice(2).join(':');
+                    const countdownId = 'gemini-countdown-' + Date.now();
+                    content.innerHTML = `
+                        <div class="summary-loading">
+                            <p style="color: var(--warning); margin-bottom: 12px; font-size: 15px;">⏳ ${escapeHtml(userMsg)}</p>
+                            <p id="${countdownId}" style="font-size: 24px; font-weight: bold; margin-bottom: 16px;">${waitSec}s</p>
+                            <button class="btn btn-small btn-primary" id="${countdownId}-btn" disabled style="margin-bottom: 8px;" onclick="IdeaForm.summarizeVideo()">Wait...</button>
+                        </div>
+                    `;
+                    // Countdown timer
+                    let remaining = waitSec;
+                    const timer = setInterval(() => {
+                        remaining--;
+                        const el = document.getElementById(countdownId);
+                        const btn = document.getElementById(countdownId + '-btn');
+                        if (!el) { clearInterval(timer); return; }
+                        if (remaining <= 0) {
+                            clearInterval(timer);
+                            el.textContent = 'Ready!';
+                            el.style.color = 'var(--success)';
+                            if (btn) { btn.disabled = false; btn.textContent = 'Try Again'; }
+                        } else {
+                            el.textContent = remaining + 's';
+                        }
+                    }, 1000);
+                    return;
+                }
+
+                // Other Gemini errors — show with retry button
                 content.innerHTML = `
                     <div class="summary-loading">
                         <p style="color: var(--danger); margin-bottom: 12px;">${escapeHtml(error.message)}</p>
