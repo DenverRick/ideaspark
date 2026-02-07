@@ -28,6 +28,8 @@ const AppConfig = {
     AIRTABLE_API_URL: 'https://api.airtable.com/v0',
     CLAUDE_API_URL: 'https://api.anthropic.com/v1/messages',
     YOUTUBE_API_URL: 'https://www.googleapis.com/youtube/v3/videos',
+    GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models',
+    GEMINI_MODEL: 'gemini-2.5-flash-preview-05-20',
 
     CLAUDE_MODEL: 'claude-sonnet-4-5-20250929',
     CLAUDE_MAX_TOKENS: 2000,
@@ -39,7 +41,8 @@ const AppConfig = {
         AIRTABLE_TOKEN: 'ideaspark_airtable_token',
         AIRTABLE_BASE_ID: 'ideaspark_airtable_base_id',
         CLAUDE_API_KEY: 'ideaspark_claude_api_key',
-        YOUTUBE_API_KEY: 'ideaspark_youtube_api_key'
+        YOUTUBE_API_KEY: 'ideaspark_youtube_api_key',
+        GEMINI_API_KEY: 'ideaspark_gemini_api_key'
     },
 
     TABLE_NAMES: {
@@ -54,7 +57,8 @@ function getApiKeys() {
         airtableToken: localStorage.getItem(AppConfig.STORAGE_KEYS.AIRTABLE_TOKEN) || '',
         airtableBaseId: localStorage.getItem(AppConfig.STORAGE_KEYS.AIRTABLE_BASE_ID) || '',
         claudeApiKey: localStorage.getItem(AppConfig.STORAGE_KEYS.CLAUDE_API_KEY) || '',
-        youtubeApiKey: localStorage.getItem(AppConfig.STORAGE_KEYS.YOUTUBE_API_KEY) || ''
+        youtubeApiKey: localStorage.getItem(AppConfig.STORAGE_KEYS.YOUTUBE_API_KEY) || '',
+        geminiApiKey: localStorage.getItem(AppConfig.STORAGE_KEYS.GEMINI_API_KEY) || ''
     };
 }
 
@@ -63,6 +67,9 @@ function saveApiKeys(keys) {
     localStorage.setItem(AppConfig.STORAGE_KEYS.AIRTABLE_BASE_ID, keys.airtableBaseId);
     localStorage.setItem(AppConfig.STORAGE_KEYS.CLAUDE_API_KEY, keys.claudeApiKey);
     localStorage.setItem(AppConfig.STORAGE_KEYS.YOUTUBE_API_KEY, keys.youtubeApiKey);
+    if (keys.geminiApiKey !== undefined) {
+        localStorage.setItem(AppConfig.STORAGE_KEYS.GEMINI_API_KEY, keys.geminiApiKey);
+    }
 }
 
 function hasValidConfig() {

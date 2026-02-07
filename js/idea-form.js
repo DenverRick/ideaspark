@@ -237,6 +237,39 @@ const IdeaForm = {
 
         // Show modal with loading state
         modal.classList.add('active');
+
+        const keys = getApiKeys();
+
+        // Prefer Gemini (direct YouTube URL support, no CORS issues)
+        if (keys.geminiApiKey) {
+            try {
+                content.innerHTML = `
+                    <div class="summary-loading">
+                        <div class="spinner" style="margin: 0 auto 12px"></div>
+                        <p>Summarizing with Gemini AI...</p>
+                    </div>
+                `;
+
+                // Build a proper YouTube watch URL for Gemini
+                const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
+                const summary = await GeminiAPI.summarizeYouTubeVideo(watchUrl, videoTitle);
+                content.innerHTML = this._formatSummary(summary);
+                return;
+
+            } catch (error) {
+                console.error('Gemini summary error:', error);
+                // If Gemini fails, show error with option to try again
+                content.innerHTML = `
+                    <div class="summary-loading">
+                        <p style="color: var(--danger); margin-bottom: 12px;">${escapeHtml(error.message)}</p>
+                        <button class="btn btn-small btn-primary" style="margin-bottom: 8px;" onclick="IdeaForm.summarizeVideo()">Try Again</button>
+                    </div>
+                `;
+                return;
+            }
+        }
+
+        // Fallback: transcript fetch + Claude (if no Gemini key)
         content.innerHTML = `
             <div class="summary-loading">
                 <div class="spinner" style="margin: 0 auto 12px"></div>
@@ -245,7 +278,6 @@ const IdeaForm = {
         `;
 
         try {
-            // Step 1: Fetch transcript
             const transcript = await YouTubeAPI.fetchTranscript(videoId);
 
             content.innerHTML = `
@@ -255,14 +287,12 @@ const IdeaForm = {
                 </div>
             `;
 
-            // Step 2: Trim transcript if too long (Claude has context limits)
             let transcriptText = transcript.text;
             const MAX_CHARS = 12000;
             if (transcriptText.length > MAX_CHARS) {
                 transcriptText = transcriptText.substring(0, MAX_CHARS) + '... [transcript truncated]';
             }
 
-            // Step 3: Send to Claude for summary
             const summaryPrompt = `Summarize this YouTube video transcript concisely. Include:
 1. A brief overview (2-3 sentences)
 2. Key points or takeaways (bullet points)
@@ -279,7 +309,6 @@ ${transcriptText}`;
                 'You are a helpful assistant that creates clear, concise video summaries. Format your response with markdown headers (### ) and bullet points for easy reading. Keep it focused and practical.'
             );
 
-            // Step 4: Render summary with basic markdown formatting
             content.innerHTML = this._formatSummary(summary);
 
         } catch (error) {
@@ -289,6 +318,7 @@ ${transcriptText}`;
             content.innerHTML = `
                 <div class="summary-loading">
                     <p style="color: var(--danger); margin-bottom: 12px;">${escapeHtml(error.message)}</p>
+                    <p style="font-size: 13px; color: var(--text-light); margin-bottom: 12px;">Tip: Add a Gemini API key in Settings for reliable video summaries.</p>
                     <button class="btn btn-small btn-primary" style="margin-bottom: 16px;" onclick="IdeaForm.summarizeVideo()">Try Again</button>
                     <details style="text-align: left; width: 100%;">
                         <summary style="cursor: pointer; font-size: 12px; color: var(--text-light); margin-bottom: 8px;">Debug Details</summary>

@@ -230,6 +230,7 @@ const Setup = {
         document.getElementById('setup-airtable-base').value = keys.airtableBaseId;
         document.getElementById('setup-claude-key').value = keys.claudeApiKey;
         document.getElementById('setup-youtube-key').value = keys.youtubeApiKey;
+        document.getElementById('setup-gemini-key').value = keys.geminiApiKey;
 
         showView('setup');
     },
@@ -242,12 +243,13 @@ const Setup = {
             airtableToken: document.getElementById('setup-airtable-token').value.trim(),
             airtableBaseId: document.getElementById('setup-airtable-base').value.trim(),
             claudeApiKey: document.getElementById('setup-claude-key').value.trim(),
-            youtubeApiKey: document.getElementById('setup-youtube-key').value.trim()
+            youtubeApiKey: document.getElementById('setup-youtube-key').value.trim(),
+            geminiApiKey: document.getElementById('setup-gemini-key').value.trim()
         };
 
-        // Validate all fields filled
+        // Validate required fields (Gemini key is optional)
         if (!keys.airtableToken || !keys.airtableBaseId || !keys.claudeApiKey || !keys.youtubeApiKey) {
-            statusEl.textContent = 'Please fill in all fields.';
+            statusEl.textContent = 'Please fill in all required fields (Gemini key is optional).';
             statusEl.className = 'setup-status error';
             return;
         }

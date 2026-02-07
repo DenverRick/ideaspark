@@ -159,6 +159,7 @@ const Dashboard = {
         document.getElementById('settings-airtable-base').value = keys.airtableBaseId;
         document.getElementById('settings-claude-key').value = keys.claudeApiKey;
         document.getElementById('settings-youtube-key').value = keys.youtubeApiKey;
+        document.getElementById('settings-gemini-key').value = keys.geminiApiKey;
         document.getElementById('settings-modal').classList.add('active');
     },
 
@@ -167,7 +168,8 @@ const Dashboard = {
             airtableToken: document.getElementById('settings-airtable-token').value.trim(),
             airtableBaseId: document.getElementById('settings-airtable-base').value.trim(),
             claudeApiKey: document.getElementById('settings-claude-key').value.trim(),
-            youtubeApiKey: document.getElementById('settings-youtube-key').value.trim()
+            youtubeApiKey: document.getElementById('settings-youtube-key').value.trim(),
+            geminiApiKey: document.getElementById('settings-gemini-key').value.trim()
         };
 
         saveApiKeys(keys);

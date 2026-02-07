@@ -45,6 +45,11 @@
                 <input type="password" id="setup-youtube-key" placeholder="AIza..." autocomplete="off">
                 <small><a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">Get your key</a></small>
             </div>
+            <div class="form-group">
+                <label for="setup-gemini-key">Gemini API Key <span style="font-weight:normal;color:var(--text-light)">(for video summaries)</span></label>
+                <input type="password" id="setup-gemini-key" placeholder="AIza..." autocomplete="off">
+                <small><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get your key from Google AI Studio</a></small>
+            </div>
             <button type="submit" class="btn btn-primary btn-full" id="setup-save-btn">
                 Save Configuration
             </button>
@@ -125,6 +130,10 @@
             <div class="form-group">
                 <label for="settings-youtube-key">YouTube API Key</label>
                 <input type="password" id="settings-youtube-key" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="settings-gemini-key">Gemini API Key</label>
+                <input type="password" id="settings-gemini-key" autocomplete="off">
             </div>
             <button type="submit" class="btn btn-primary btn-full">Update Keys</button>
         </form>
@@ -411,6 +420,7 @@
 <script src="js/airtable.js"></script>
 <script src="js/youtube.js"></script>
 <script src="js/claude.js"></script>
+<script src="js/gemini.js"></script>
 <script src="js/speech.js"></script>
 <script src="js/dashboard.js"></script>
 <script src="js/idea-form.js"></script>
