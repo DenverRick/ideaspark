@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>IdeaSpark</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- SETUP VIEW -->
+<!-- ============================================ -->
+<section data-view="setup" class="view">
+    <div class="setup-container">
+        <div class="setup-header">
+            <h1>IdeaSpark</h1>
+            <p>AI-Powered Idea & Task Manager</p>
+        </div>
+        <div class="setup-welcome">
+            <p>Welcome! To get started, enter your API keys below. These are stored locally in your browser and never sent anywhere except their respective services.</p>
+        </div>
+        <form id="setup-form" class="setup-form">
+            <div class="form-group">
+                <label for="setup-airtable-token">Airtable Personal Access Token</label>
+                <input type="password" id="setup-airtable-token" placeholder="pat..." autocomplete="off">
+                <small><a href="https://airtable.com/create/tokens" target="_blank" rel="noopener">Get your token</a></small>
+            </div>
+            <div class="form-group">
+                <label for="setup-airtable-base">Airtable Base ID</label>
+                <input type="text" id="setup-airtable-base" placeholder="appXXXXXXXXXXXXXX" autocomplete="off">
+                <small>Found in your Airtable base URL: airtable.com/<strong>appXXX...</strong>/...</small>
+            </div>
+            <div class="form-group">
+                <label for="setup-claude-key">Claude API Key</label>
+                <input type="password" id="setup-claude-key" placeholder="sk-ant-..." autocomplete="off">
+                <small><a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Get your key</a></small>
+            </div>
+            <div class="form-group">
+                <label for="setup-youtube-key">YouTube Data API Key</label>
+                <input type="password" id="setup-youtube-key" placeholder="AIza..." autocomplete="off">
+                <small><a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">Get your key</a></small>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full" id="setup-save-btn">
+                Save Configuration
+            </button>
+            <div id="setup-status" class="setup-status"></div>
+        </form>
+    </div>
+</section>
+
+<!-- ============================================ -->
+<!-- DASHBOARD VIEW -->
+<!-- ============================================ -->
+<section data-view="dashboard" class="view">
+    <header class="app-header">
+        <h1 class="app-title">IdeaSpark</h1>
+        <button class="icon-btn" id="settings-btn" aria-label="Settings">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+    </header>
+
+    <div class="filter-bar">
+        <select id="filter-status" class="filter-select">
+            <option value="">All Status</option>
+            <option value="Idea">Idea</option>
+            <option value="Task">Task</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Done">Done</option>
+        </select>
+        <select id="filter-category" class="filter-select">
+            <option value="">All Categories</option>
+            <option value="Senior Geeks">Senior Geeks</option>
+            <option value="Pickleball">Pickleball</option>
+            <option value="Tennis">Tennis</option>
+            <option value="Singles Club">Singles Club</option>
+            <option value="Home Projects">Home Projects</option>
+            <option value="General">General</option>
+        </select>
+        <select id="sort-select" class="filter-select">
+            <option value="Created-desc">Newest First</option>
+            <option value="Created-asc">Oldest First</option>
+            <option value="Priority-asc">Priority</option>
+            <option value="TargetDate-asc">Target Date</option>
+        </select>
+    </div>
+
+    <div class="dashboard-content" id="ideas-list">
+        <!-- Idea cards rendered here -->
+    </div>
+
+    <button class="fab" id="fab-add" aria-label="Add new idea">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+</section>
+
+<!-- ============================================ -->
+<!-- SETTINGS MODAL -->
+<!-- ============================================ -->
+<div class="modal-overlay" id="settings-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Settings</h2>
+            <button class="icon-btn modal-close" id="settings-close" aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <form id="settings-form" class="setup-form">
+            <div class="form-group">
+                <label for="settings-airtable-token">Airtable Token</label>
+                <input type="password" id="settings-airtable-token" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="settings-airtable-base">Airtable Base ID</label>
+                <input type="text" id="settings-airtable-base" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="settings-claude-key">Claude API Key</label>
+                <input type="password" id="settings-claude-key" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="settings-youtube-key">YouTube API Key</label>
+                <input type="password" id="settings-youtube-key" autocomplete="off">
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">Update Keys</button>
+        </form>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- IDEA FORM VIEW -->
+<!-- ============================================ -->
+<section data-view="idea-form" class="view">
+    <header class="app-header">
+        <button class="icon-btn" id="form-back-btn" aria-label="Back">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <h1 class="app-title" id="form-title">New Idea</h1>
+        <div style="width:44px"></div>
+    </header>
+
+    <div class="form-content">
+        <form id="idea-form">
+            <div class="form-group">
+                <label for="idea-title">Title <span class="required">*</span></label>
+                <input type="text" id="idea-title" placeholder="What's your idea?" required>
+            </div>
+
+            <div class="form-group">
+                <label for="idea-youtube-url">YouTube URL</label>
+                <input type="url" id="idea-youtube-url" placeholder="https://youtube.com/watch?v=...">
+                <div id="video-preview" class="video-preview hidden">
+                    <img id="video-thumb" src="" alt="" class="video-thumb">
+                    <div class="video-info">
+                        <div class="video-title" id="video-title-text"></div>
+                        <div class="video-meta">
+                            <span id="video-channel-text"></span>
+                            <span id="video-duration-text"></span>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-small btn-accent hidden" id="summarize-video-btn" style="margin-top: 8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    Summarize Video
+                </button>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group form-half">
+                    <label for="idea-category">Category <span class="required">*</span></label>
+                    <select id="idea-category" required>
+                        <option value="">Select...</option>
+                        <option value="Senior Geeks">Senior Geeks</option>
+                        <option value="Pickleball">Pickleball</option>
+                        <option value="Tennis">Tennis</option>
+                        <option value="Singles Club">Singles Club</option>
+                        <option value="Home Projects">Home Projects</option>
+                        <option value="General">General</option>
+                    </select>
+                </div>
+                <div class="form-group form-half">
+                    <label for="idea-status">Status</label>
+                    <select id="idea-status">
+                        <option value="Idea">Idea</option>
+                        <option value="Task">Task</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Done">Done</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Priority</label>
+                <div class="priority-group">
+                    <label class="priority-option">
+                        <input type="radio" name="idea-priority" value="High">
+                        <span class="priority-label priority-high">High</span>
+                    </label>
+                    <label class="priority-option">
+                        <input type="radio" name="idea-priority" value="Medium" checked>
+                        <span class="priority-label priority-medium">Medium</span>
+                    </label>
+                    <label class="priority-option">
+                        <input type="radio" name="idea-priority" value="Low">
+                        <span class="priority-label priority-low">Low</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="idea-target-date">Target Date</label>
+                <input type="date" id="idea-target-date">
+            </div>
+
+            <div class="form-group">
+                <label for="idea-thoughts">My Thoughts</label>
+                <div class="textarea-with-mic">
+                    <textarea id="idea-thoughts" rows="4" placeholder="What are you thinking about this idea?"></textarea>
+                    <button type="button" class="mic-btn" id="form-mic-btn" aria-label="Voice input">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hidden fields for video metadata -->
+            <input type="hidden" id="idea-video-title">
+            <input type="hidden" id="idea-video-thumbnail">
+            <input type="hidden" id="idea-video-channel">
+            <input type="hidden" id="idea-video-duration">
+            <input type="hidden" id="idea-record-id">
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="idea-save-btn">Save Idea</button>
+                <button type="button" class="btn btn-secondary" id="idea-cancel-btn">Cancel</button>
+                <button type="button" class="btn btn-danger hidden" id="idea-delete-btn">Delete</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- ============================================ -->
+<!-- IDEA DETAIL VIEW -->
+<!-- ============================================ -->
+<section data-view="idea-detail" class="view">
+    <header class="app-header">
+        <button class="icon-btn" id="detail-back-btn" aria-label="Back">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <h1 class="app-title detail-title" id="detail-title">Idea</h1>
+        <button class="icon-btn" id="detail-edit-btn" aria-label="Edit">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+    </header>
+
+    <!-- Tab content panels -->
+    <div class="tab-content" id="tab-content">
+        <!-- DETAILS TAB -->
+        <div class="tab-panel active" data-tab="details" id="panel-details">
+            <div id="detail-video-section" class="detail-video-wrapper hidden">
+                <div class="detail-video">
+                    <img id="detail-video-thumb" src="" alt="" class="detail-video-thumb">
+                    <div class="detail-video-info">
+                        <div class="detail-video-title" id="detail-video-title"></div>
+                        <div class="detail-video-meta">
+                            <span id="detail-video-channel"></span>
+                            <span id="detail-video-duration"></span>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding: 0 16px 12px;">
+                    <button type="button" class="btn btn-small btn-accent" id="detail-summarize-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        Summarize Video
+                    </button>
+                </div>
+            </div>
+
+            <div class="detail-meta">
+                <div class="detail-meta-row">
+                    <span class="detail-label">Category</span>
+                    <span class="badge" id="detail-category"></span>
+                </div>
+                <div class="detail-meta-row">
+                    <span class="detail-label">Status</span>
+                    <select id="detail-status" class="inline-select">
+                        <option value="Idea">Idea</option>
+                        <option value="Task">Task</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Done">Done</option>
+                    </select>
+                </div>
+                <div class="detail-meta-row">
+                    <span class="detail-label">Priority</span>
+                    <select id="detail-priority" class="inline-select">
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+                <div class="detail-meta-row" id="detail-target-row">
+                    <span class="detail-label">Target Date</span>
+                    <span id="detail-target-date"></span>
+                </div>
+                <div class="detail-meta-row">
+                    <span class="detail-label">Created</span>
+                    <span id="detail-created-date"></span>
+                </div>
+            </div>
+
+            <div class="detail-thoughts">
+                <h3>My Thoughts</h3>
+                <div id="detail-thoughts-text" class="thoughts-text"></div>
+                <button class="btn btn-small btn-secondary" id="add-thoughts-btn">Add More Thoughts</button>
+                <div id="add-thoughts-section" class="hidden">
+                    <div class="textarea-with-mic">
+                        <textarea id="detail-thoughts-input" rows="3" placeholder="Add more thoughts..."></textarea>
+                        <button type="button" class="mic-btn" id="detail-mic-btn" aria-label="Voice input">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                        </button>
+                    </div>
+                    <button class="btn btn-small btn-primary" id="save-thoughts-btn">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- BRAINSTORM TAB -->
+        <div class="tab-panel" data-tab="brainstorm" id="panel-brainstorm">
+            <div class="chat-messages" id="chat-messages">
+                <!-- Chat messages rendered here -->
+            </div>
+            <div class="chat-input-bar">
+                <div class="chat-input-row">
+                    <div class="textarea-with-mic chat-textarea-wrap">
+                        <textarea id="chat-input" rows="1" placeholder="Type a message..."></textarea>
+                        <button type="button" class="mic-btn" id="chat-mic-btn" aria-label="Voice input">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                        </button>
+                    </div>
+                    <button class="btn btn-primary btn-send" id="chat-send-btn" aria-label="Send">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </button>
+                </div>
+                <button class="btn btn-accent btn-full" id="chat-generate-plan-btn">Generate Action Plan</button>
+            </div>
+        </div>
+
+        <!-- ACTION STEPS TAB -->
+        <div class="tab-panel" data-tab="actions" id="panel-actions">
+            <div id="action-steps-content">
+                <div id="no-steps-message" class="empty-state">
+                    <p>No action steps yet. Start a brainstorm conversation, then generate an action plan!</p>
+                    <button class="btn btn-primary" id="generate-plan-btn">Generate Action Plan</button>
+                </div>
+                <div id="steps-list" class="steps-list hidden">
+                    <!-- Steps rendered here -->
+                </div>
+                <div id="steps-footer" class="steps-footer hidden">
+                    <button class="btn btn-small btn-secondary" id="add-step-btn">Add Step</button>
+                    <button class="btn btn-small btn-danger" id="regenerate-plan-btn">Regenerate Plan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab bar -->
+    <nav class="tab-bar">
+        <button class="tab-btn active" data-tab-target="details">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <span>Details</span>
+        </button>
+        <button class="tab-btn" data-tab-target="brainstorm">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>Brainstorm</span>
+        </button>
+        <button class="tab-btn" data-tab-target="actions">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span>Actions</span>
+        </button>
+    </nav>
+</section>
+
+<!-- Video Summary Modal -->
+<div class="modal-overlay" id="summary-modal">
+    <div class="modal summary-modal">
+        <div class="modal-header">
+            <h2>Video Summary</h2>
+            <button class="icon-btn modal-close" id="summary-close" aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div id="summary-content" class="summary-content">
+            <!-- Summary text rendered here -->
+        </div>
+        <div class="summary-actions">
+            <button class="btn btn-small btn-secondary" id="summary-copy-btn">Copy Summary</button>
+            <button class="btn btn-small btn-primary" id="summary-to-thoughts-btn">Paste to My Thoughts</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast" class="toast"></div>
+
+<!-- Scripts (dependency order) -->
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/airtable.js"></script>
+<script src="js/youtube.js"></script>
+<script src="js/claude.js"></script>
+<script src="js/speech.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/idea-form.js"></script>
+<script src="js/brainstorm.js"></script>
+<script src="js/action-steps.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

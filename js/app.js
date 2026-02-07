@@ -1,0 +1,300 @@
+// IdeaSpark - App Entry Point & Idea Detail Coordinator
+
+const IdeaDetail = {
+    speechInput: null,
+    tabsLoaded: { details: false, brainstorm: false, actions: false },
+
+    init() {
+        // Back button
+        document.getElementById('detail-back-btn').addEventListener('click', () => {
+            Dashboard.show();
+        });
+
+        // Edit button
+        document.getElementById('detail-edit-btn').addEventListener('click', () => {
+            if (currentIdeaId) {
+                IdeaForm.open(currentIdeaId);
+            }
+        });
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.tabTarget;
+                this.switchTab(target);
+            });
+        });
+
+        // Inline status/priority changes
+        document.getElementById('detail-status').addEventListener('change', (e) => {
+            this.updateField('Status', e.target.value);
+        });
+
+        document.getElementById('detail-priority').addEventListener('change', (e) => {
+            this.updateField('Priority', e.target.value);
+        });
+
+        // Add more thoughts
+        document.getElementById('add-thoughts-btn').addEventListener('click', () => {
+            document.getElementById('add-thoughts-section').classList.toggle('hidden');
+        });
+
+        document.getElementById('save-thoughts-btn').addEventListener('click', () => {
+            this.saveThoughts();
+        });
+
+        // Summarize video in detail view
+        document.getElementById('detail-summarize-btn').addEventListener('click', () => {
+            this.summarizeVideo();
+        });
+
+        // Speech for detail thoughts
+        const thoughtsInput = document.getElementById('detail-thoughts-input');
+        const detailMic = document.getElementById('detail-mic-btn');
+        this.speechInput = new SpeechInput(thoughtsInput, detailMic);
+    },
+
+    async open(recordId) {
+        currentIdeaId = recordId;
+        this.tabsLoaded = { details: false, brainstorm: false, actions: false };
+
+        showView('idea-detail');
+
+        // Reset to details tab
+        this.switchTab('details');
+
+        // Load idea data
+        try {
+            currentIdeaData = await AirtableAPI.getIdea(recordId);
+            this.renderDetails();
+            this.tabsLoaded.details = true;
+        } catch (error) {
+            showToast('Failed to load idea', 'error');
+            Dashboard.show();
+        }
+    },
+
+    renderDetails() {
+        if (!currentIdeaData) return;
+        const f = currentIdeaData.fields;
+
+        // Title
+        document.getElementById('detail-title').textContent = f.Title || 'Untitled';
+
+        // Video section
+        const videoSection = document.getElementById('detail-video-section');
+        if (f.VideoThumbnail) {
+            videoSection.classList.remove('hidden');
+            document.getElementById('detail-video-thumb').src = f.VideoThumbnail;
+            document.getElementById('detail-video-title').textContent = f.VideoTitle || '';
+            document.getElementById('detail-video-channel').textContent = f.VideoChannel || '';
+            document.getElementById('detail-video-duration').textContent = f.VideoDuration || '';
+        } else {
+            videoSection.classList.add('hidden');
+        }
+
+        // Category badge
+        const catEl = document.getElementById('detail-category');
+        catEl.textContent = f.Category || 'General';
+        catEl.style.background = AppConfig.CATEGORIES[f.Category] || '#808080';
+
+        // Status & priority selects
+        document.getElementById('detail-status').value = f.Status || 'Idea';
+        document.getElementById('detail-priority').value = f.Priority || 'Medium';
+
+        // Target date
+        const targetRow = document.getElementById('detail-target-row');
+        if (f.TargetDate) {
+            targetRow.classList.remove('hidden');
+            document.getElementById('detail-target-date').textContent = formatDate(f.TargetDate);
+        } else {
+            targetRow.classList.add('hidden');
+        }
+
+        // Created date
+        document.getElementById('detail-created-date').textContent = formatDate(currentIdeaData.createdTime);
+
+        // Thoughts
+        document.getElementById('detail-thoughts-text').textContent = f.MyThoughts || '';
+
+        // Reset add thoughts section
+        document.getElementById('add-thoughts-section').classList.add('hidden');
+        document.getElementById('detail-thoughts-input').value = '';
+    },
+
+    summarizeVideo() {
+        if (!currentIdeaData) return;
+        const url = currentIdeaData.fields.YouTubeURL;
+        if (!url) {
+            showToast('No YouTube URL for this idea', 'error');
+            return;
+        }
+        // Temporarily set the form's YouTube URL so IdeaForm.summarizeVideo() can use it
+        document.getElementById('idea-youtube-url').value = url;
+        document.getElementById('idea-video-title').value = currentIdeaData.fields.VideoTitle || '';
+        IdeaForm.summarizeVideo();
+    },
+
+    switchTab(tabName) {
+        // Update tab buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tabTarget === tabName);
+        });
+
+        // Update panels
+        document.querySelectorAll('.tab-panel').forEach(panel => {
+            panel.classList.toggle('active', panel.dataset.tab === tabName);
+        });
+
+        // Lazy-load tab content
+        if (tabName === 'brainstorm' && !this.tabsLoaded.brainstorm) {
+            Brainstorm.open(currentIdeaId);
+            this.tabsLoaded.brainstorm = true;
+        }
+
+        if (tabName === 'actions' && !this.tabsLoaded.actions) {
+            ActionSteps.open(currentIdeaId);
+            this.tabsLoaded.actions = true;
+        }
+    },
+
+    async updateField(field, value) {
+        if (!currentIdeaId) return;
+
+        const updateFields = { [field]: value };
+
+        // Auto-set CompletedDate when status changes to Done
+        if (field === 'Status' && value === 'Done') {
+            updateFields.CompletedDate = new Date().toISOString().split('T')[0];
+        }
+
+        try {
+            await AirtableAPI.updateIdea(currentIdeaId, updateFields);
+            // Update local data
+            if (currentIdeaData) {
+                currentIdeaData.fields[field] = value;
+            }
+        } catch (error) {
+            showToast('Failed to update: ' + error.message, 'error');
+        }
+    },
+
+    async saveThoughts() {
+        if (!currentIdeaId) return;
+
+        const newThoughts = document.getElementById('detail-thoughts-input').value.trim();
+        if (!newThoughts) return;
+
+        const existing = currentIdeaData?.fields?.MyThoughts || '';
+        const timestamp = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+        const combined = existing
+            ? `${existing}\n\n[${timestamp}]\n${newThoughts}`
+            : newThoughts;
+
+        try {
+            await AirtableAPI.updateIdea(currentIdeaId, { MyThoughts: combined });
+
+            // Update local data and UI
+            if (currentIdeaData) {
+                currentIdeaData.fields.MyThoughts = combined;
+            }
+            document.getElementById('detail-thoughts-text').textContent = combined;
+            document.getElementById('detail-thoughts-input').value = '';
+            document.getElementById('add-thoughts-section').classList.add('hidden');
+
+            if (this.speechInput) this.speechInput.stop();
+            showToast('Thoughts saved!', 'success');
+        } catch (error) {
+            showToast('Failed to save thoughts', 'error');
+        }
+    }
+};
+
+
+// ============================================
+// SETUP SCREEN LOGIC
+// ============================================
+
+const Setup = {
+    init() {
+        document.getElementById('setup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await this.save();
+        });
+    },
+
+    show() {
+        // Pre-fill existing values if any
+        const keys = getApiKeys();
+        document.getElementById('setup-airtable-token').value = keys.airtableToken;
+        document.getElementById('setup-airtable-base').value = keys.airtableBaseId;
+        document.getElementById('setup-claude-key').value = keys.claudeApiKey;
+        document.getElementById('setup-youtube-key').value = keys.youtubeApiKey;
+
+        showView('setup');
+    },
+
+    async save() {
+        const statusEl = document.getElementById('setup-status');
+        const saveBtn = document.getElementById('setup-save-btn');
+
+        const keys = {
+            airtableToken: document.getElementById('setup-airtable-token').value.trim(),
+            airtableBaseId: document.getElementById('setup-airtable-base').value.trim(),
+            claudeApiKey: document.getElementById('setup-claude-key').value.trim(),
+            youtubeApiKey: document.getElementById('setup-youtube-key').value.trim()
+        };
+
+        // Validate all fields filled
+        if (!keys.airtableToken || !keys.airtableBaseId || !keys.claudeApiKey || !keys.youtubeApiKey) {
+            statusEl.textContent = 'Please fill in all fields.';
+            statusEl.className = 'setup-status error';
+            return;
+        }
+
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Validating...';
+        statusEl.textContent = 'Testing Airtable connection...';
+        statusEl.className = 'setup-status';
+
+        // Save keys first (so validation can use them)
+        saveApiKeys(keys);
+
+        // Validate Airtable connection
+        const result = await AirtableAPI.validateConnection();
+
+        if (result.valid) {
+            statusEl.textContent = 'Connected! Loading your ideas...';
+            statusEl.className = 'setup-status success';
+            setTimeout(() => Dashboard.show(), 500);
+        } else {
+            statusEl.textContent = `Connection failed: ${result.error}. Please check your Airtable token and Base ID.`;
+            statusEl.className = 'setup-status error';
+        }
+
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Configuration';
+    }
+};
+
+
+// ============================================
+// APP INITIALIZATION
+// ============================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize all modules
+    Setup.init();
+    Dashboard.init();
+    IdeaForm.init();
+    IdeaDetail.init();
+    Brainstorm.init();
+    ActionSteps.init();
+
+    // Route to setup or dashboard
+    if (hasValidConfig()) {
+        Dashboard.show();
+    } else {
+        Setup.show();
+    }
+});

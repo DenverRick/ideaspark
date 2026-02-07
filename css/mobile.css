@@ -1,0 +1,159 @@
+/* IdeaSpark - Mobile & Responsive Styles */
+
+/* ========== iOS Safari Fixes ========== */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent iOS auto-zoom on input focus (requires 16px min) */
+input, textarea, select {
+    font-size: 16px !important;
+}
+
+/* Safe area padding for bottom fixed elements */
+.tab-bar {
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.fab {
+    bottom: calc(24px + env(safe-area-inset-bottom));
+}
+
+.chat-input-bar {
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+
+.toast {
+    bottom: calc(80px + env(safe-area-inset-bottom));
+}
+
+/* ========== Mobile Default (< 768px) ========== */
+@media (max-width: 767px) {
+    .dashboard-content {
+        padding-bottom: 80px; /* Space for FAB */
+    }
+
+    /* Ensure cards don't get too cramped */
+    .idea-card {
+        padding: 12px;
+    }
+
+    .card-thumb,
+    .card-thumb-placeholder {
+        width: 70px;
+        height: 52px;
+    }
+
+    /* Settings modal full-width */
+    .modal {
+        max-width: 100%;
+        border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    /* Detail video section stacks on very small screens */
+    .detail-video-thumb {
+        width: 120px;
+        height: 68px;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 374px) {
+    .filter-bar {
+        gap: 4px;
+        padding: 8px;
+    }
+
+    .filter-select {
+        font-size: 12px;
+        padding: 6px 22px 6px 6px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+}
+
+/* ========== Tablet (768px - 1023px) ========== */
+@media (min-width: 768px) {
+    .setup-container {
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 40px 24px;
+    }
+
+    .dashboard-content {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 16px;
+    }
+
+    .form-content {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .modal {
+        border-radius: var(--radius);
+        margin-bottom: 10vh;
+    }
+
+    .modal-overlay {
+        align-items: center;
+    }
+
+    .fab {
+        right: 32px;
+        bottom: 32px;
+    }
+}
+
+/* ========== Desktop (>= 1024px) ========== */
+@media (min-width: 1024px) {
+    .dashboard-content {
+        max-width: 900px;
+    }
+
+    /* Two-column card layout */
+    .dashboard-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-content: flex-start;
+    }
+
+    .idea-card {
+        width: calc(50% - 6px);
+        margin-bottom: 0;
+    }
+
+    /* Detail view: wider panels */
+    .tab-content {
+        max-width: 800px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    /* Chat messages wider */
+    .chat-bubble {
+        max-width: 65%;
+    }
+
+    .chat-input-bar {
+        max-width: 800px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    /* Tab bar centered */
+    .tab-bar {
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .fab {
+        right: calc(50% - 450px + 20px);
+    }
+}
