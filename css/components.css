@@ -617,6 +617,7 @@
     text-align: center;
     padding: 40px 20px;
     color: var(--text-light);
+    grid-column: 1 / -1;
 }
 
 .empty-state p {
@@ -715,7 +716,6 @@
     padding: 14px;
     background: var(--bg-white);
     border-radius: var(--radius);
-    margin-bottom: 10px;
 }
 
 .skeleton-thumb {

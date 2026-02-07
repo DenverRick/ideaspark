@@ -465,3 +465,9 @@ body {
     padding: 8px 12px;
     -webkit-overflow-scrolling: touch;
 }
+
+/* Dashboard view background for desktop centering */
+[data-view="dashboard"] .app-header,
+[data-view="dashboard"] .filter-bar {
+    background: var(--bg-white);
+}
