@@ -103,6 +103,15 @@ const ActionSteps = {
     },
 
     async generatePlan() {
+        // Ensure we have a valid idea ID
+        if (!this.currentIdeaId && currentIdeaId) {
+            this.currentIdeaId = currentIdeaId;
+        }
+        if (!this.currentIdeaId) {
+            showToast('No idea selected. Go back and open an idea first.', 'error');
+            return;
+        }
+
         const history = Brainstorm.getHistory();
 
         if (history.length === 0) {

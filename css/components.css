@@ -291,12 +291,33 @@
     gap: 12px;
 }
 
+.detail-video-thumb-link {
+    position: relative;
+    display: block;
+    flex-shrink: 0;
+}
+
 .detail-video-thumb {
     width: 160px;
     height: 90px;
     border-radius: var(--radius-sm);
     object-fit: cover;
-    flex-shrink: 0;
+    display: block;
+}
+
+.video-play-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: var(--radius-sm);
+    transition: background 0.2s;
+}
+
+.detail-video-thumb-link:active .video-play-overlay {
+    background: rgba(0, 0, 0, 0.5);
 }
 
 .detail-video-info {

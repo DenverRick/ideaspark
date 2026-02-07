@@ -229,13 +229,10 @@ const Brainstorm = {
     },
 
     switchToActionsAndGenerate() {
-        // Switch to actions tab
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
-        document.querySelector('[data-tab-target="actions"]').classList.add('active');
-        document.getElementById('panel-actions').classList.add('active');
+        // Use IdeaDetail.switchTab to properly initialize ActionSteps with the idea ID
+        IdeaDetail.switchTab('actions');
 
-        // Generate action plan
+        // Generate action plan after tab is initialized
         ActionSteps.generatePlan();
     },
 

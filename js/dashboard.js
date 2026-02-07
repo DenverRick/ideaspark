@@ -138,6 +138,7 @@ const Dashboard = {
                 'Tennis': '🎾',
                 'Singles Club': '🥂',
                 'Home Projects': '🔨',
+                'Web App Projects': '🌐',
                 'General': '💡'
             };
             const emoji = catEmojis[f.Category] || '💡';

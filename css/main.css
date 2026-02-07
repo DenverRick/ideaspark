@@ -287,13 +287,14 @@ body {
     bottom: 80px;
     left: 50%;
     transform: translateX(-50%) translateY(100px);
+    opacity: 0;
     padding: 12px 24px;
     border-radius: var(--radius);
     color: white;
     font-size: 14px;
     font-weight: 500;
     z-index: 1000;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease;
     max-width: calc(100% - 32px);
     text-align: center;
     pointer-events: none;
@@ -301,6 +302,7 @@ body {
 
 .toast-show {
     transform: translateX(-50%) translateY(0);
+    opacity: 1;
 }
 
 .toast-error {

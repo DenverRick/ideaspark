@@ -97,6 +97,7 @@
             <option value="Tennis">Tennis</option>
             <option value="Singles Club">Singles Club</option>
             <option value="Home Projects">Home Projects</option>
+            <option value="Web App Projects">Web App Projects</option>
             <option value="General">General</option>
         </select>
         <select id="sort-select" class="filter-select">
@@ -221,6 +222,7 @@
                         <option value="Tennis">Tennis</option>
                         <option value="Singles Club">Singles Club</option>
                         <option value="Home Projects">Home Projects</option>
+                        <option value="Web App Projects">Web App Projects</option>
                         <option value="General">General</option>
                     </select>
                 </div>
@@ -309,7 +311,12 @@
         <div class="tab-panel active" data-tab="details" id="panel-details">
             <div id="detail-video-section" class="detail-video-wrapper hidden">
                 <div class="detail-video">
-                    <img id="detail-video-thumb" src="" alt="" class="detail-video-thumb">
+                    <a id="detail-video-link" href="#" target="_blank" rel="noopener noreferrer" class="detail-video-thumb-link">
+                        <img id="detail-video-thumb" src="" alt="" class="detail-video-thumb">
+                        <div class="video-play-overlay">
+                            <svg width="36" height="36" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </a>
                     <div class="detail-video-info">
                         <div class="detail-video-title" id="detail-video-title"></div>
                         <div class="detail-video-meta">
@@ -318,7 +325,11 @@
                         </div>
                     </div>
                 </div>
-                <div style="padding: 0 16px 12px;">
+                <div style="padding: 0 16px 12px; display: flex; gap: 8px;">
+                    <a id="detail-watch-btn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-small btn-primary" style="text-decoration: none;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:middle"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        Watch Video
+                    </a>
                     <button type="button" class="btn btn-small btn-accent" id="detail-summarize-btn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                         Summarize Video
@@ -334,7 +345,15 @@
             <div class="detail-meta">
                 <div class="detail-meta-row">
                     <span class="detail-label">Category</span>
-                    <span class="badge" id="detail-category"></span>
+                    <select id="detail-category" class="inline-select">
+                        <option value="Senior Geeks">Senior Geeks</option>
+                        <option value="Pickleball">Pickleball</option>
+                        <option value="Tennis">Tennis</option>
+                        <option value="Singles Club">Singles Club</option>
+                        <option value="Home Projects">Home Projects</option>
+                        <option value="Web App Projects">Web App Projects</option>
+                        <option value="General">General</option>
+                    </select>
                 </div>
                 <div class="detail-meta-row">
                     <span class="detail-label">Status</span>

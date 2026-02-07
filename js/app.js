@@ -30,7 +30,11 @@ const IdeaDetail = {
             });
         });
 
-        // Inline status/priority changes
+        // Inline category/status/priority changes
+        document.getElementById('detail-category').addEventListener('change', (e) => {
+            this.updateField('Category', e.target.value);
+        });
+
         document.getElementById('detail-status').addEventListener('change', (e) => {
             this.updateField('Status', e.target.value);
         });
@@ -101,6 +105,10 @@ const IdeaDetail = {
             document.getElementById('detail-video-title').textContent = f.VideoTitle || '';
             document.getElementById('detail-video-channel').textContent = f.VideoChannel || '';
             document.getElementById('detail-video-duration').textContent = f.VideoDuration || '';
+            // Set YouTube URL on thumbnail and watch button
+            const ytUrl = f.YouTubeURL || '#';
+            document.getElementById('detail-video-link').href = ytUrl;
+            document.getElementById('detail-watch-btn').href = ytUrl;
         } else {
             videoSection.classList.add('hidden');
         }
@@ -129,12 +137,8 @@ const IdeaDetail = {
             refUrlsContainer.classList.add('hidden');
         }
 
-        // Category badge
-        const catEl = document.getElementById('detail-category');
-        catEl.textContent = f.Category || 'General';
-        catEl.style.background = AppConfig.CATEGORIES[f.Category] || '#808080';
-
-        // Status & priority selects
+        // Category, Status & Priority selects
+        document.getElementById('detail-category').value = f.Category || 'General';
         document.getElementById('detail-status').value = f.Status || 'Idea';
         document.getElementById('detail-priority').value = f.Priority || 'Medium';
 

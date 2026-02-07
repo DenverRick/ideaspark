@@ -9,6 +9,7 @@ const AppConfig = {
         'Tennis': '#32CD32',
         'Singles Club': '#FF69B4',
         'Home Projects': '#4169E1',
+        'Web App Projects': '#20B2AA',
         'General': '#808080'
     },
 
