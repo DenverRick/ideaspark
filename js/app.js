@@ -167,8 +167,21 @@ const IdeaDetail = {
         // Created date
         document.getElementById('detail-created-date').textContent = formatDate(currentIdeaData.createdTime);
 
-        // Thoughts
-        document.getElementById('detail-thoughts-text').textContent = f.MyThoughts || '';
+        // Thoughts — show formatted version if available
+        const thoughtsEl = document.getElementById('detail-thoughts-text');
+        const formatBtn = document.getElementById('format-thoughts-btn');
+
+        if (f.FormattedThoughts) {
+            // Render saved formatted markdown
+            thoughtsEl.innerHTML = this.markdownToHtml(f.FormattedThoughts);
+            thoughtsEl.classList.add('formatted');
+            formatBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Raw`;
+        } else {
+            // Show raw text
+            thoughtsEl.textContent = f.MyThoughts || '';
+            thoughtsEl.classList.remove('formatted');
+            formatBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Format`;
+        }
 
         // Reset add thoughts section
         document.getElementById('add-thoughts-section').classList.add('hidden');
@@ -246,13 +259,26 @@ const IdeaDetail = {
             : newThoughts;
 
         try {
-            await AirtableAPI.updateIdea(currentIdeaId, { MyThoughts: combined });
+            // Clear formatted version since raw text changed — user can re-format
+            const updateFields = { MyThoughts: combined };
+            if (currentIdeaData?.fields?.FormattedThoughts) {
+                updateFields.FormattedThoughts = '';
+            }
+            await AirtableAPI.updateIdea(currentIdeaId, updateFields);
 
             // Update local data and UI
             if (currentIdeaData) {
                 currentIdeaData.fields.MyThoughts = combined;
+                currentIdeaData.fields.FormattedThoughts = '';
             }
-            document.getElementById('detail-thoughts-text').textContent = combined;
+            const thoughtsEl = document.getElementById('detail-thoughts-text');
+            thoughtsEl.textContent = combined;
+            thoughtsEl.classList.remove('formatted');
+
+            // Reset format button to show "Format" (not "Raw")
+            const formatBtn = document.getElementById('format-thoughts-btn');
+            formatBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Format`;
+
             document.getElementById('detail-thoughts-input').value = '';
             document.getElementById('add-thoughts-section').classList.add('hidden');
 
@@ -281,6 +307,16 @@ const IdeaDetail = {
             return;
         }
 
+        // If we already have stored formatted markdown, use it (no API call needed)
+        const storedMd = currentIdeaData?.fields?.FormattedThoughts;
+        if (storedMd) {
+            const html = this.markdownToHtml(storedMd);
+            thoughtsEl.innerHTML = html;
+            thoughtsEl.classList.add('formatted');
+            formatBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Raw`;
+            return;
+        }
+
         formatBtn.disabled = true;
         formatBtn.textContent = 'Formatting...';
 
@@ -298,12 +334,24 @@ const IdeaDetail = {
 Keep ALL the original information — do not add new content or commentary. Just reorganize and format what's there. If there are timestamped entries (like [Feb 7, 10:58 AM]), keep them as section dividers. Output ONLY the formatted markdown, nothing else.`
             );
 
-            // Convert markdown to HTML
+            // Convert markdown to HTML and display
             const html = this.markdownToHtml(formatted);
             thoughtsEl.innerHTML = html;
             thoughtsEl.classList.add('formatted');
             formatBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Raw`;
-            showToast('Thoughts formatted!', 'success');
+
+            // Save the formatted markdown to Airtable so it persists
+            try {
+                await AirtableAPI.updateIdea(currentIdeaId, { FormattedThoughts: formatted });
+                if (currentIdeaData) {
+                    currentIdeaData.fields.FormattedThoughts = formatted;
+                }
+                showToast('Thoughts formatted & saved!', 'success');
+            } catch (saveErr) {
+                // Formatting worked but save failed — still show formatted, warn user
+                console.error('Failed to save formatted thoughts:', saveErr);
+                showToast('Formatted! (Note: Add a "FormattedThoughts" Long text field to your Airtable IDEAS table to save formatting)', 'info');
+            }
         } catch (error) {
             showToast('Failed to format: ' + error.message, 'error');
         } finally {
@@ -367,11 +415,50 @@ Keep ALL the original information — do not add new content or commentary. Just
     printIdea() {
         if (!currentIdeaData) return;
 
-        // Set the title for print CSS ::before pseudo-element
-        const detailsPanel = document.querySelector('.tab-panel[data-tab="details"]');
-        detailsPanel.dataset.printTitle = currentIdeaData.fields.Title || 'Untitled Idea';
+        const title = currentIdeaData.fields.Title || 'Untitled Idea';
+        const thoughtsEl = document.getElementById('detail-thoughts-text');
+        const isFormatted = thoughtsEl.classList.contains('formatted');
 
-        window.print();
+        // Build a clean print window with just the thoughts
+        const thoughtsContent = isFormatted
+            ? thoughtsEl.innerHTML
+            : '<pre style="white-space:pre-wrap;font-family:inherit;margin:0;line-height:1.6;">' + escapeHtml(currentIdeaData.fields.MyThoughts || '') + '</pre>';
+
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            showToast('Pop-up blocked — please allow pop-ups for printing', 'error');
+            return;
+        }
+
+        printWindow.document.write(`<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>${escapeHtml(title)}</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 700px; margin: 0 auto; padding: 32px 24px; color: #333; font-size: 14px; line-height: 1.6; }
+h1 { font-size: 22px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 2px solid #333; }
+.meta { font-size: 12px; color: #888; margin-bottom: 20px; }
+h2, h3 { font-size: 15px; font-weight: 700; margin: 16px 0 6px 0; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+h2:first-child, h3:first-child { margin-top: 0; }
+ul, ol { margin: 4px 0 10px 20px; }
+li { margin-bottom: 3px; }
+p { margin-bottom: 8px; }
+hr { border: none; border-top: 1px solid #ddd; margin: 12px 0; }
+strong { font-weight: 700; }
+@media print { body { padding: 0; } }
+</style></head><body>
+<h1>${escapeHtml(title)}</h1>
+<div class="meta">${escapeHtml(currentIdeaData.fields.Category || '')} · ${escapeHtml(currentIdeaData.fields.Status || '')} · Printed ${new Date().toLocaleDateString()}</div>
+<div>${thoughtsContent}</div>
+</body></html>`);
+        printWindow.document.close();
+
+        // Wait for content to render, then print
+        printWindow.onload = () => {
+            printWindow.print();
+        };
+        // Fallback if onload doesn't fire
+        setTimeout(() => {
+            try { printWindow.print(); } catch(e) {}
+        }, 500);
     },
 
     async addReferenceLink() {
