@@ -99,13 +99,16 @@ const IdeaForm = {
         this.editingRecordId = recordId;
         this.resetForm();
 
+        const deleteBtn = document.getElementById('idea-delete-btn');
         if (recordId) {
             document.getElementById('form-title').textContent = 'Edit Idea';
-            document.getElementById('idea-delete-btn').classList.remove('hidden');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.classList.remove('hidden');
             this.loadIdea(recordId);
         } else {
             document.getElementById('form-title').textContent = 'New Idea';
-            document.getElementById('idea-delete-btn').classList.add('hidden');
+            deleteBtn.textContent = 'Discard';
+            deleteBtn.classList.remove('hidden');
         }
 
         showView('idea-form');
@@ -451,8 +454,16 @@ ${transcriptText}`;
     },
 
     async confirmDelete() {
-        if (!this.editingRecordId) return;
+        // Discard unsaved draft
+        if (!this.editingRecordId) {
+            if (!confirm('Discard this idea? Your changes will be lost.')) return;
+            if (this.speechInput) this.speechInput.stop();
+            showToast('Idea discarded', 'info');
+            Dashboard.show();
+            return;
+        }
 
+        // Delete saved idea from Airtable
         if (!confirm('Delete this idea? This cannot be undone.')) return;
 
         try {
