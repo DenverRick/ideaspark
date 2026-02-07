@@ -252,19 +252,19 @@
     bottom: 6px;
     width: 36px;
     height: 36px;
-    border: none;
-    background: var(--bg);
+    border: 1.5px solid var(--primary);
+    background: rgba(74, 144, 226, 0.08);
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-light);
+    color: var(--primary);
     transition: all 0.2s;
 }
 
 .mic-btn:active {
-    background: var(--border);
+    background: rgba(74, 144, 226, 0.2);
 }
 
 .mic-btn.mic-active {
@@ -362,6 +362,12 @@
     content: "No thoughts yet.";
     color: var(--text-lighter);
     font-style: italic;
+}
+
+.thoughts-action-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
 }
 
 /* ========== Tab Bar ========== */

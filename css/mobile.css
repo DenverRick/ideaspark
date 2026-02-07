@@ -111,12 +111,9 @@ input, textarea, select {
 
 /* ========== Desktop (>= 1024px) ========== */
 @media (min-width: 1024px) {
-    .dashboard-content {
-        max-width: 900px;
-    }
-
     /* Two-column card layout */
     .dashboard-content {
+        max-width: 1200px;
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
@@ -126,6 +123,14 @@ input, textarea, select {
     .idea-card {
         width: calc(50% - 6px);
         margin-bottom: 0;
+    }
+
+    /* Allow card titles to wrap on desktop */
+    .card-title {
+        white-space: normal;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
     }
 
     /* Detail view: wider panels */
@@ -154,6 +159,18 @@ input, textarea, select {
     }
 
     .fab {
-        right: calc(50% - 450px + 20px);
+        right: calc(50% - 600px + 20px);
+    }
+}
+
+/* ========== Wide Desktop (>= 1440px) ========== */
+@media (min-width: 1440px) {
+    /* Three-column card layout */
+    .idea-card {
+        width: calc(33.33% - 8px);
+    }
+
+    .fab {
+        right: calc(50% - 600px + 24px);
     }
 }

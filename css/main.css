@@ -93,7 +93,17 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 60%;
+    max-width: 50%;
+}
+
+.header-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.header-actions #detail-delete-btn {
+    color: var(--danger);
 }
 
 /* Buttons */

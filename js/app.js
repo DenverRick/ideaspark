@@ -5,8 +5,8 @@ const IdeaDetail = {
     tabsLoaded: { details: false, brainstorm: false, actions: false },
 
     init() {
-        // Back button
-        document.getElementById('detail-back-btn').addEventListener('click', () => {
+        // Home button
+        document.getElementById('detail-home-btn').addEventListener('click', () => {
             Dashboard.show();
         });
 
@@ -15,6 +15,11 @@ const IdeaDetail = {
             if (currentIdeaId) {
                 IdeaForm.open(currentIdeaId);
             }
+        });
+
+        // Delete button
+        document.getElementById('detail-delete-btn').addEventListener('click', () => {
+            this.confirmDelete();
         });
 
         // Tab switching
@@ -41,6 +46,13 @@ const IdeaDetail = {
 
         document.getElementById('save-thoughts-btn').addEventListener('click', () => {
             this.saveThoughts();
+        });
+
+        // Cancel adding thoughts
+        document.getElementById('cancel-thoughts-btn').addEventListener('click', () => {
+            document.getElementById('detail-thoughts-input').value = '';
+            document.getElementById('add-thoughts-section').classList.add('hidden');
+            if (this.speechInput) this.speechInput.stop();
         });
 
         // Summarize video in detail view
@@ -206,6 +218,19 @@ const IdeaDetail = {
             showToast('Thoughts saved!', 'success');
         } catch (error) {
             showToast('Failed to save thoughts', 'error');
+        }
+    },
+
+    async confirmDelete() {
+        if (!currentIdeaId) return;
+        if (!confirm('Delete this idea? This cannot be undone.')) return;
+
+        try {
+            await AirtableAPI.deleteIdea(currentIdeaId);
+            showToast('Idea deleted', 'success');
+            Dashboard.show();
+        } catch (error) {
+            showToast('Failed to delete: ' + error.message, 'error');
         }
     }
 };
