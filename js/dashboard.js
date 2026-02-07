@@ -113,9 +113,22 @@ const Dashboard = {
         const statusColor = AppConfig.STATUSES[f.Status] || '#6C757D';
         const priority = AppConfig.PRIORITIES[f.Priority] || AppConfig.PRIORITIES.Medium;
 
-        const thumbHTML = f.VideoThumbnail
-            ? `<img class="card-thumb" src="${escapeHtml(f.VideoThumbnail)}" alt="" loading="lazy">`
-            : `<div class="card-thumb-placeholder">\uD83D\uDCA1</div>`;
+        let thumbHTML;
+        if (f.VideoThumbnail) {
+            thumbHTML = `<img class="card-thumb" src="${escapeHtml(f.VideoThumbnail)}" alt="" loading="lazy">`;
+        } else {
+            // Category-specific placeholder with color + emoji
+            const catEmojis = {
+                'Senior Geeks': '💻',
+                'Pickleball': '🏓',
+                'Tennis': '🎾',
+                'Singles Club': '🥂',
+                'Home Projects': '🔨',
+                'General': '💡'
+            };
+            const emoji = catEmojis[f.Category] || '💡';
+            thumbHTML = `<div class="card-thumb-placeholder" style="background:${categoryColor}">${emoji}</div>`;
+        }
 
         const snippet = truncateText(f.MyThoughts, 60);
         const dateStr = formatRelativeDate(record.createdTime);
