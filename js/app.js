@@ -105,6 +105,30 @@ const IdeaDetail = {
             videoSection.classList.add('hidden');
         }
 
+        // Reference URLs
+        const refUrlsContainer = document.getElementById('detail-reference-urls');
+        const refUrlsList = document.getElementById('detail-reference-list');
+        if (f.ReferenceURLs && f.ReferenceURLs.trim()) {
+            const urls = f.ReferenceURLs.trim().split('\n').filter(u => u.trim());
+            if (urls.length > 0) {
+                refUrlsContainer.classList.remove('hidden');
+                refUrlsList.innerHTML = urls.map(url => {
+                    const trimmed = url.trim();
+                    let displayText = trimmed;
+                    try {
+                        const parsed = new URL(trimmed);
+                        displayText = parsed.hostname + (parsed.pathname !== '/' ? parsed.pathname : '');
+                        if (displayText.length > 50) displayText = displayText.substring(0, 47) + '...';
+                    } catch (e) { /* not a valid URL, show raw text */ }
+                    return `<li><a href="${escapeHtml(trimmed)}" target="_blank" rel="noopener noreferrer">${escapeHtml(displayText)}</a></li>`;
+                }).join('');
+            } else {
+                refUrlsContainer.classList.add('hidden');
+            }
+        } else {
+            refUrlsContainer.classList.add('hidden');
+        }
+
         // Category badge
         const catEl = document.getElementById('detail-category');
         catEl.textContent = f.Category || 'General';

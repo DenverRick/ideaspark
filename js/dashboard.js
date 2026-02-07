@@ -46,6 +46,20 @@ const Dashboard = {
             e.preventDefault();
             this.saveSettings();
         });
+
+        // Export/Import settings
+        document.getElementById('settings-export-btn').addEventListener('click', () => {
+            this.exportSettings();
+        });
+        document.getElementById('settings-import-btn').addEventListener('click', () => {
+            this.showImportSection();
+        });
+        document.getElementById('settings-import-confirm-btn').addEventListener('click', () => {
+            this.confirmImport();
+        });
+        document.getElementById('settings-import-cancel-btn').addEventListener('click', () => {
+            this.hideImportSection();
+        });
     },
 
     async show() {
@@ -189,5 +203,80 @@ const Dashboard = {
         document.getElementById('settings-modal').classList.remove('active');
         showToast('Settings updated!', 'success');
         this.loadIdeas();
+    },
+
+    exportSettings() {
+        const keys = getApiKeys();
+        const exportData = {
+            _format: 'IdeaSpark Settings',
+            _version: 1,
+            airtableToken: keys.airtableToken,
+            airtableBaseId: keys.airtableBaseId,
+            claudeApiKey: keys.claudeApiKey,
+            youtubeApiKey: keys.youtubeApiKey,
+            geminiApiKey: keys.geminiApiKey
+        };
+        const json = JSON.stringify(exportData, null, 2);
+        navigator.clipboard.writeText(json).then(() => {
+            showToast('Settings copied to clipboard!', 'success');
+        }).catch(() => {
+            // Fallback: show the JSON in the import textarea for manual copy
+            document.getElementById('settings-import-textarea').value = json;
+            document.getElementById('settings-import-section').classList.remove('hidden');
+            showToast('Could not copy automatically — select and copy the text below', 'info');
+        });
+    },
+
+    showImportSection() {
+        document.getElementById('settings-import-section').classList.remove('hidden');
+        document.getElementById('settings-import-textarea').value = '';
+        document.getElementById('settings-import-textarea').focus();
+    },
+
+    hideImportSection() {
+        document.getElementById('settings-import-section').classList.add('hidden');
+        document.getElementById('settings-import-textarea').value = '';
+    },
+
+    confirmImport() {
+        const json = document.getElementById('settings-import-textarea').value.trim();
+        if (!json) {
+            showToast('Please paste your settings JSON first', 'error');
+            return;
+        }
+
+        let data;
+        try {
+            data = JSON.parse(json);
+        } catch (e) {
+            showToast('Invalid JSON format', 'error');
+            return;
+        }
+
+        // Validate required keys exist
+        if (!data.airtableToken || !data.airtableBaseId || !data.claudeApiKey || !data.youtubeApiKey) {
+            showToast('Missing required API keys in imported data', 'error');
+            return;
+        }
+
+        const keys = {
+            airtableToken: data.airtableToken,
+            airtableBaseId: data.airtableBaseId,
+            claudeApiKey: data.claudeApiKey,
+            youtubeApiKey: data.youtubeApiKey,
+            geminiApiKey: data.geminiApiKey || ''
+        };
+
+        saveApiKeys(keys);
+
+        // Refresh form fields
+        document.getElementById('settings-airtable-token').value = keys.airtableToken;
+        document.getElementById('settings-airtable-base').value = keys.airtableBaseId;
+        document.getElementById('settings-claude-key').value = keys.claudeApiKey;
+        document.getElementById('settings-youtube-key').value = keys.youtubeApiKey;
+        document.getElementById('settings-gemini-key').value = keys.geminiApiKey;
+
+        this.hideImportSection();
+        showToast('Settings imported successfully!', 'success');
     }
 };

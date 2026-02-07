@@ -123,6 +123,7 @@ const IdeaForm = {
         document.getElementById('idea-video-duration').value = '';
         document.getElementById('video-preview').classList.add('hidden');
         document.getElementById('summarize-video-btn').classList.add('hidden');
+        document.getElementById('idea-reference-urls').value = '';
 
         // Reset priority to Medium
         const mediumRadio = document.querySelector('input[name="idea-priority"][value="Medium"]');
@@ -140,6 +141,7 @@ const IdeaForm = {
             document.getElementById('idea-status').value = f.Status || 'Idea';
             document.getElementById('idea-target-date').value = f.TargetDate || '';
             document.getElementById('idea-thoughts').value = f.MyThoughts || '';
+            document.getElementById('idea-reference-urls').value = f.ReferenceURLs || '';
             document.getElementById('idea-record-id').value = recordId;
 
             // Priority radio
@@ -419,7 +421,8 @@ ${transcriptText}`;
             Status: document.getElementById('idea-status').value,
             Priority: priority,
             TargetDate: document.getElementById('idea-target-date').value || null,
-            MyThoughts: document.getElementById('idea-thoughts').value || null
+            MyThoughts: document.getElementById('idea-thoughts').value || null,
+            ReferenceURLs: document.getElementById('idea-reference-urls').value.trim() || null
         };
 
         // Set CompletedDate when status changes to Done

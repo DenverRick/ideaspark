@@ -319,6 +319,54 @@
     content: " \00B7 ";
 }
 
+/* ========== Reference URLs ========== */
+.detail-reference-urls {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.detail-reference-urls h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-bottom: 8px;
+}
+
+.reference-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.reference-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.reference-list li:last-child {
+    border-bottom: none;
+}
+
+.reference-list a {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 14px;
+    word-break: break-all;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.reference-list a::before {
+    content: "🔗";
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.reference-list a:active {
+    opacity: 0.7;
+}
+
 .detail-meta {
     padding: 16px;
 }
