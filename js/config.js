@@ -29,7 +29,7 @@ const AppConfig = {
     CLAUDE_API_URL: 'https://api.anthropic.com/v1/messages',
     YOUTUBE_API_URL: 'https://www.googleapis.com/youtube/v3/videos',
     GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models',
-    GEMINI_MODEL: 'gemini-2.5-flash-preview-05-20',
+    GEMINI_MODEL: 'gemini-2.5-flash',
 
     CLAUDE_MODEL: 'claude-sonnet-4-5-20250929',
     CLAUDE_MAX_TOKENS: 2000,
