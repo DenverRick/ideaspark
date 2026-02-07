@@ -471,3 +471,98 @@ body {
 [data-view="dashboard"] .filter-bar {
     background: var(--bg-white);
 }
+
+/* ========== Print Styles ========== */
+@media print {
+    body {
+        overflow: visible;
+        height: auto;
+        background: white;
+    }
+
+    .view {
+        height: auto;
+        overflow: visible;
+    }
+
+    /* Hide non-printable elements */
+    .app-header,
+    .tab-bar,
+    .fab,
+    .toast,
+    .modal-overlay,
+    #add-thoughts-btn,
+    #add-thoughts-section,
+    .thoughts-header-actions,
+    #add-reference-btn,
+    #add-reference-section,
+    .ref-delete-btn,
+    .detail-video-wrapper .btn,
+    .video-play-overlay {
+        display: none !important;
+    }
+
+    /* Show only the detail view */
+    [data-view]:not([data-view="idea-detail"]) {
+        display: none !important;
+    }
+
+    [data-view="idea-detail"] {
+        display: block !important;
+    }
+
+    .tab-content {
+        max-width: 100% !important;
+        overflow: visible !important;
+    }
+
+    .tab-panel {
+        overflow: visible !important;
+    }
+
+    .tab-panel[data-tab="details"] {
+        display: block !important;
+        padding: 0 !important;
+    }
+
+    /* Print title at top */
+    .tab-panel[data-tab="details"]::before {
+        content: attr(data-print-title);
+        display: block;
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #333;
+    }
+
+    /* Clean up sections for print */
+    .detail-video-wrapper,
+    .detail-reference-urls,
+    .detail-meta,
+    .detail-thoughts {
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding: 8px 0 !important;
+        background: white !important;
+        break-inside: avoid;
+    }
+
+    .detail-meta-row {
+        border-bottom-color: #ccc;
+    }
+
+    .thoughts-text {
+        font-size: 13px;
+    }
+
+    .inline-select {
+        border: none;
+        padding: 0;
+        font-weight: 600;
+        background-image: none;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+}

@@ -445,9 +445,21 @@
     padding: 16px;
 }
 
-.detail-thoughts h3 {
-    font-size: 16px;
+.thoughts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 8px;
+}
+
+.thoughts-header h3 {
+    font-size: 16px;
+    margin: 0;
+}
+
+.thoughts-header-actions {
+    display: flex;
+    gap: 6px;
 }
 
 .thoughts-text {
@@ -463,6 +475,55 @@
     content: "No thoughts yet.";
     color: var(--text-lighter);
     font-style: italic;
+}
+
+/* Formatted thoughts (AI-formatted HTML) */
+.thoughts-text.formatted {
+    white-space: normal;
+}
+
+.thoughts-text.formatted h1,
+.thoughts-text.formatted h2,
+.thoughts-text.formatted h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 16px 0 6px 0;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 4px;
+}
+
+.thoughts-text.formatted h1:first-child,
+.thoughts-text.formatted h2:first-child,
+.thoughts-text.formatted h3:first-child {
+    margin-top: 0;
+}
+
+.thoughts-text.formatted p {
+    margin-bottom: 8px;
+}
+
+.thoughts-text.formatted ul,
+.thoughts-text.formatted ol {
+    margin: 4px 0 10px 20px;
+}
+
+.thoughts-text.formatted li {
+    margin-bottom: 3px;
+}
+
+.thoughts-text.formatted strong {
+    font-weight: 700;
+}
+
+.thoughts-text.formatted em {
+    font-style: italic;
+}
+
+.thoughts-text.formatted hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 12px 0;
 }
 
 .thoughts-action-bar {

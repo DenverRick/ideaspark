@@ -59,6 +59,16 @@ const IdeaDetail = {
             if (this.speechInput) this.speechInput.stop();
         });
 
+        // Format thoughts with AI
+        document.getElementById('format-thoughts-btn').addEventListener('click', () => {
+            this.formatThoughts();
+        });
+
+        // Print idea
+        document.getElementById('print-idea-btn').addEventListener('click', () => {
+            this.printIdea();
+        });
+
         // Reference links management
         document.getElementById('add-reference-btn').addEventListener('click', () => {
             document.getElementById('add-reference-section').classList.remove('hidden');
@@ -251,6 +261,117 @@ const IdeaDetail = {
         } catch (error) {
             showToast('Failed to save thoughts', 'error');
         }
+    },
+
+    async formatThoughts() {
+        const rawText = currentIdeaData?.fields?.MyThoughts;
+        if (!rawText || !rawText.trim()) {
+            showToast('No thoughts to format', 'error');
+            return;
+        }
+
+        const formatBtn = document.getElementById('format-thoughts-btn');
+        const thoughtsEl = document.getElementById('detail-thoughts-text');
+
+        // If already showing formatted, toggle back to raw
+        if (thoughtsEl.classList.contains('formatted')) {
+            thoughtsEl.classList.remove('formatted');
+            thoughtsEl.textContent = rawText;
+            formatBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Format`;
+            return;
+        }
+
+        formatBtn.disabled = true;
+        formatBtn.textContent = 'Formatting...';
+
+        try {
+            const ideaTitle = currentIdeaData?.fields?.Title || 'Untitled';
+            const formatted = await ClaudeAPI.sendMessage(
+                [{ role: 'user', content: rawText }],
+                `You are a text formatter. The user has pasted raw notes/thoughts about "${ideaTitle}". Clean up and format the text into well-structured, readable content using simple markdown. Use:
+- ## for section headings
+- **bold** for emphasis on key terms
+- Bullet lists (- item) for ingredients, supplies, or listed items
+- Numbered lists (1. item) for ordered steps
+- Horizontal rules (---) to separate distinct sections or dated entries
+
+Keep ALL the original information — do not add new content or commentary. Just reorganize and format what's there. If there are timestamped entries (like [Feb 7, 10:58 AM]), keep them as section dividers. Output ONLY the formatted markdown, nothing else.`
+            );
+
+            // Convert markdown to HTML
+            const html = this.markdownToHtml(formatted);
+            thoughtsEl.innerHTML = html;
+            thoughtsEl.classList.add('formatted');
+            formatBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Raw`;
+            showToast('Thoughts formatted!', 'success');
+        } catch (error) {
+            showToast('Failed to format: ' + error.message, 'error');
+        } finally {
+            formatBtn.disabled = false;
+        }
+    },
+
+    markdownToHtml(md) {
+        let html = escapeHtml(md);
+
+        // Headings: ### h3, ## h2, # h1
+        html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+        html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+        html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+
+        // Horizontal rules
+        html = html.replace(/^---+$/gm, '<hr>');
+
+        // Bold and italic
+        html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+        // Unordered lists (- item)
+        html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+        html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
+
+        // Ordered lists (1. item)
+        html = html.replace(/^\d+\. (.+)$/gm, '<oli>$1</oli>');
+        html = html.replace(/((?:<oli>.*<\/oli>\n?)+)/g, (match) => {
+            return '<ol>' + match.replace(/<\/?oli>/g, (tag) => tag.replace('oli', 'li')) + '</ol>';
+        });
+
+        // Paragraphs: double newlines become paragraph breaks
+        html = html.replace(/\n\n+/g, '</p><p>');
+
+        // Single newlines within paragraphs become <br>
+        html = html.replace(/\n/g, '<br>');
+
+        // Clean up: wrap in paragraphs, remove empty ones
+        html = '<p>' + html + '</p>';
+        html = html.replace(/<p>\s*<\/p>/g, '');
+        html = html.replace(/<p>\s*(<h[123]>)/g, '$1');
+        html = html.replace(/(<\/h[123]>)\s*<\/p>/g, '$1');
+        html = html.replace(/<p>\s*(<hr>)\s*<\/p>/g, '$1');
+        html = html.replace(/<p>\s*(<ul>)/g, '$1');
+        html = html.replace(/(<\/ul>)\s*<\/p>/g, '$1');
+        html = html.replace(/<p>\s*(<ol>)/g, '$1');
+        html = html.replace(/(<\/ol>)\s*<\/p>/g, '$1');
+        html = html.replace(/<br>\s*(<h[123]>)/g, '$1');
+        html = html.replace(/(<\/h[123]>)\s*<br>/g, '$1');
+        html = html.replace(/<br>\s*(<hr>)/g, '$1');
+        html = html.replace(/(<hr>)\s*<br>/g, '$1');
+        html = html.replace(/<br>\s*(<ul>)/g, '$1');
+        html = html.replace(/(<\/ul>)\s*<br>/g, '$1');
+        html = html.replace(/<br>\s*(<ol>)/g, '$1');
+        html = html.replace(/(<\/ol>)\s*<br>/g, '$1');
+
+        return html;
+    },
+
+    printIdea() {
+        if (!currentIdeaData) return;
+
+        // Set the title for print CSS ::before pseudo-element
+        const detailsPanel = document.querySelector('.tab-panel[data-tab="details"]');
+        detailsPanel.dataset.printTitle = currentIdeaData.fields.Title || 'Untitled Idea';
+
+        window.print();
     },
 
     async addReferenceLink() {
