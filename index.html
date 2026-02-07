@@ -56,6 +56,18 @@
             </button>
             <div id="setup-status" class="setup-status"></div>
         </form>
+
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center;">
+            <p style="font-size: 14px; color: var(--text-light); margin-bottom: 12px;">Already set up on another device?</p>
+            <button type="button" class="btn btn-secondary btn-full" id="setup-import-btn">Import Settings from Another Device</button>
+            <div id="setup-import-section" class="hidden" style="margin-top: 12px; text-align: left;">
+                <textarea id="setup-import-textarea" rows="5" placeholder="Paste the exported JSON here..." style="width: 100%; font-size: 13px; font-family: monospace;"></textarea>
+                <div style="display: flex; gap: 8px; margin-top: 8px;">
+                    <button type="button" class="btn btn-primary btn-small" id="setup-import-confirm-btn" style="flex: 1;">Apply & Connect</button>
+                    <button type="button" class="btn btn-secondary btn-small" id="setup-import-cancel-btn" style="flex: 1;">Cancel</button>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 

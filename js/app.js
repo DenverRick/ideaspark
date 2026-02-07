@@ -270,6 +270,57 @@ const Setup = {
             e.preventDefault();
             await this.save();
         });
+
+        // Import settings on setup screen
+        document.getElementById('setup-import-btn').addEventListener('click', () => {
+            document.getElementById('setup-import-section').classList.remove('hidden');
+            document.getElementById('setup-import-textarea').value = '';
+            document.getElementById('setup-import-textarea').focus();
+        });
+
+        document.getElementById('setup-import-cancel-btn').addEventListener('click', () => {
+            document.getElementById('setup-import-section').classList.add('hidden');
+            document.getElementById('setup-import-textarea').value = '';
+        });
+
+        document.getElementById('setup-import-confirm-btn').addEventListener('click', async () => {
+            await this.importSettings();
+        });
+    },
+
+    async importSettings() {
+        const json = document.getElementById('setup-import-textarea').value.trim();
+        if (!json) {
+            showToast('Please paste your settings JSON first', 'error');
+            return;
+        }
+
+        let data;
+        try {
+            data = JSON.parse(json);
+        } catch (e) {
+            showToast('Invalid JSON format', 'error');
+            return;
+        }
+
+        if (!data.airtableToken || !data.airtableBaseId || !data.claudeApiKey || !data.youtubeApiKey) {
+            showToast('Missing required API keys in imported data', 'error');
+            return;
+        }
+
+        // Fill in all the form fields with imported data
+        document.getElementById('setup-airtable-token').value = data.airtableToken;
+        document.getElementById('setup-airtable-base').value = data.airtableBaseId;
+        document.getElementById('setup-claude-key').value = data.claudeApiKey;
+        document.getElementById('setup-youtube-key').value = data.youtubeApiKey;
+        document.getElementById('setup-gemini-key').value = data.geminiApiKey || '';
+
+        // Hide import section
+        document.getElementById('setup-import-section').classList.add('hidden');
+
+        // Trigger the normal save flow (validates Airtable connection)
+        showToast('Settings imported! Validating...', 'info');
+        await this.save();
     },
 
     show() {
