@@ -7,9 +7,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💡</text></svg>">
     <title>IdeaSpark</title>
-    <link rel="stylesheet" href="css/main.css?v=13">
-    <link rel="stylesheet" href="css/components.css?v=13">
-    <link rel="stylesheet" href="css/mobile.css?v=13">
+    <link rel="stylesheet" href="css/main.css?v=14">
+    <link rel="stylesheet" href="css/components.css?v=14">
+    <link rel="stylesheet" href="css/mobile.css?v=14">
 </head>
 <body>
 
@@ -83,22 +83,9 @@
     </header>
 
     <div class="filter-bar">
-        <select id="filter-status" class="filter-select">
-            <option value="">All Status</option>
-            <option value="Idea">Idea</option>
-            <option value="Task">Task</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Done">Done</option>
-        </select>
-        <select id="filter-category" class="filter-select">
-            <option value="">All Categories</option>
-        </select>
-        <select id="sort-select" class="filter-select">
-            <option value="Created-desc">Newest First</option>
-            <option value="Created-asc">Oldest First</option>
-            <option value="Priority-asc">Priority</option>
-            <option value="TargetDate-asc">Target Date</option>
-        </select>
+        <div id="filter-category-pills" class="filter-pills">
+            <!-- "All" + category pills populated dynamically -->
+        </div>
     </div>
 
     <div class="dashboard-content" id="ideas-list">
@@ -212,11 +199,6 @@
                 <label for="idea-reference-urls">Reference URLs</label>
                 <textarea id="idea-reference-urls" rows="3" placeholder="Add reference links, one per line&#10;https://example.com&#10;https://another-site.com" spellcheck="false"></textarea>
                 <small style="color: var(--text-lighter); font-size: 12px;">One URL per line. These appear as clickable links on the idea detail page.</small>
-            </div>
-
-            <div class="form-group">
-                <label for="idea-target-date">Target Date</label>
-                <input type="date" id="idea-target-date">
             </div>
 
             <div class="form-group">
@@ -455,18 +437,18 @@
 <div id="toast" class="toast"></div>
 
 <!-- Scripts (dependency order) -->
-<script src="js/config.js?v=13"></script>
-<script src="js/utils.js?v=13"></script>
-<script src="js/airtable.js?v=13"></script>
-<script src="js/youtube.js?v=13"></script>
-<script src="js/claude.js?v=13"></script>
-<script src="js/gemini.js?v=13"></script>
-<script src="js/speech.js?v=13"></script>
-<script src="js/dashboard.js?v=13"></script>
-<script src="js/idea-form.js?v=13"></script>
-<script src="js/brainstorm.js?v=13"></script>
-<script src="js/action-steps.js?v=13"></script>
-<script src="js/app.js?v=13"></script>
+<script src="js/config.js?v=14"></script>
+<script src="js/utils.js?v=14"></script>
+<script src="js/airtable.js?v=14"></script>
+<script src="js/youtube.js?v=14"></script>
+<script src="js/claude.js?v=14"></script>
+<script src="js/gemini.js?v=14"></script>
+<script src="js/speech.js?v=14"></script>
+<script src="js/dashboard.js?v=14"></script>
+<script src="js/idea-form.js?v=14"></script>
+<script src="js/brainstorm.js?v=14"></script>
+<script src="js/action-steps.js?v=14"></script>
+<script src="js/app.js?v=14"></script>
 
 </body>
 </html>

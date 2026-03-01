@@ -151,7 +151,6 @@ const IdeaForm = {
 
             document.getElementById('idea-title').value = f.Title || '';
             document.getElementById('idea-youtube-url').value = f.YouTubeURL || '';
-            document.getElementById('idea-target-date').value = f.TargetDate || '';
             document.getElementById('idea-thoughts').value = f.MyThoughts || '';
             document.getElementById('idea-reference-urls').value = f.ReferenceURLs || '';
             document.getElementById('idea-record-id').value = recordId;
@@ -429,7 +428,6 @@ ${transcriptText}`;
             Category: category,
             Status: 'Idea',
             Priority: 'Medium',
-            TargetDate: document.getElementById('idea-target-date').value || null,
             MyThoughts: document.getElementById('idea-thoughts').value || null,
             ReferenceURLs: document.getElementById('idea-reference-urls').value.trim() || null
         };

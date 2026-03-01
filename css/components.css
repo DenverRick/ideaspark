@@ -37,14 +37,32 @@
 
 /* ========== Filter Bar ========== */
 .filter-bar {
-    display: flex;
-    gap: 8px;
     padding: 10px 12px;
     background: var(--bg-white);
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
+}
+
+/* Horizontally scrollable pill row for the dashboard category filter */
+.filter-pills {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+}
+
+.filter-pills::-webkit-scrollbar {
+    display: none;
+}
+
+/* Slightly more compact than the idea-form pills */
+.filter-pill {
+    flex-shrink: 0;
+    font-size: 13px;
+    padding: 6px 12px;
 }
 
 .filter-select {

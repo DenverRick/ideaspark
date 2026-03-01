@@ -116,11 +116,47 @@ function hideLoading(container) {
 
 // Populate all category selects and pill buttons dynamically
 function populateCategorySelects(categories) {
-    // Dashboard filter — keep "All Categories" as first option
-    const filterSel = document.getElementById('filter-category');
-    if (filterSel) {
-        while (filterSel.options.length > 1) filterSel.remove(1);
-        categories.forEach(cat => filterSel.add(new Option(cat, cat)));
+    // Dashboard filter — horizontal pill row with "All" first
+    const filterPills = document.getElementById('filter-category-pills');
+    if (filterPills) {
+        const currentFilter = (typeof Dashboard !== 'undefined') ? Dashboard.currentFilter.category : '';
+        filterPills.innerHTML = '';
+
+        // "All" pill
+        const allPill = document.createElement('button');
+        allPill.type = 'button';
+        allPill.className = 'category-pill filter-pill' + (currentFilter === '' ? ' selected' : '');
+        allPill.dataset.value = '';
+        allPill.textContent = 'All';
+        if (currentFilter === '') {
+            allPill.style.background = 'var(--primary)';
+            allPill.style.color = 'white';
+        }
+        allPill.addEventListener('click', () => {
+            _selectFilterPill(filterPills, '');
+            if (typeof Dashboard !== 'undefined') Dashboard._setCategoryFilter('');
+        });
+        filterPills.appendChild(allPill);
+
+        categories.forEach(cat => {
+            const color = getCategoryColor(cat);
+            const emoji = getCategoryEmoji(cat);
+            const pill = document.createElement('button');
+            pill.type = 'button';
+            pill.className = 'category-pill filter-pill' + (currentFilter === cat ? ' selected' : '');
+            pill.dataset.value = cat;
+            pill.style.borderColor = color;
+            pill.innerHTML = `<span>${emoji}</span>${escapeHtml(cat)}`;
+            if (currentFilter === cat) {
+                pill.style.background = color;
+                pill.style.color = 'white';
+            }
+            pill.addEventListener('click', () => {
+                _selectFilterPill(filterPills, cat);
+                if (typeof Dashboard !== 'undefined') Dashboard._setCategoryFilter(cat);
+            });
+            filterPills.appendChild(pill);
+        });
     }
 
     // Idea form pill selector
@@ -162,6 +198,21 @@ function populateCategorySelects(categories) {
         categories.forEach(cat => detailSel.add(new Option(cat, cat)));
         if (currentVal) detailSel.value = currentVal;
     }
+}
+
+// Update visual state of filter pills in the dashboard bar
+function _selectFilterPill(container, value) {
+    container.querySelectorAll('.filter-pill').forEach(p => {
+        const isMatch = p.dataset.value === value;
+        p.classList.toggle('selected', isMatch);
+        if (isMatch) {
+            p.style.background = value === '' ? 'var(--primary)' : getCategoryColor(p.dataset.value);
+            p.style.color = 'white';
+        } else {
+            p.style.background = '';
+            p.style.color = '';
+        }
+    });
 }
 
 // Fetch fresh categories from Airtable and update all selects + cache

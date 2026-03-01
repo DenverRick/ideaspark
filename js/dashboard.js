@@ -1,27 +1,9 @@
 // IdeaSpark - Dashboard Logic
 
 const Dashboard = {
-    currentFilter: { status: '', category: '' },
-    currentSort: { field: 'Created', direction: 'desc' },
+    currentFilter: { category: '' },
 
     init() {
-        // Filter handlers
-        document.getElementById('filter-status').addEventListener('change', (e) => {
-            this.currentFilter.status = e.target.value;
-            this.loadIdeas();
-        });
-
-        document.getElementById('filter-category').addEventListener('change', (e) => {
-            this.currentFilter.category = e.target.value;
-            this.loadIdeas();
-        });
-
-        document.getElementById('sort-select').addEventListener('change', (e) => {
-            const [field, direction] = e.target.value.split('-');
-            this.currentSort = { field, direction };
-            this.loadIdeas();
-        });
-
         // FAB
         document.getElementById('fab-add').addEventListener('click', () => {
             IdeaForm.open();
@@ -62,6 +44,12 @@ const Dashboard = {
         });
     },
 
+    // Called by filter pills in utils.js populateCategorySelects()
+    _setCategoryFilter(value) {
+        this.currentFilter.category = value;
+        this.loadIdeas();
+    },
+
     async show() {
         showView('dashboard');
         await this.loadIdeas();
@@ -74,25 +62,15 @@ const Dashboard = {
         list.innerHTML = this._skeletonHTML(5);
 
         try {
-            const filterParts = [];
-            if (this.currentFilter.status) {
-                filterParts.push(`{Status}="${this.currentFilter.status}"`);
-            }
-            if (this.currentFilter.category) {
-                filterParts.push(`{Category}="${this.currentFilter.category}"`);
-            }
-
             let filterFormula = '';
-            if (filterParts.length === 1) {
-                filterFormula = filterParts[0];
-            } else if (filterParts.length > 1) {
-                filterFormula = `AND(${filterParts.join(',')})`;
+            if (this.currentFilter.category) {
+                filterFormula = `{Category}="${this.currentFilter.category}"`;
             }
 
             const records = await AirtableAPI.listIdeas({
                 filterFormula,
-                sortField: this.currentSort.field,
-                sortDirection: this.currentSort.direction
+                sortField: 'Created',
+                sortDirection: 'desc'
             });
 
             this.renderIdeas(records);
@@ -137,7 +115,6 @@ const Dashboard = {
 
         const snippet = truncateText(f.MyThoughts, 60);
         const dateStr = formatRelativeDate(record.createdTime);
-        const targetStr = f.TargetDate ? `\uD83D\uDCC5 ${formatDate(f.TargetDate)}` : '';
 
         return `
             <div class="idea-card" data-id="${record.id}">
@@ -150,7 +127,7 @@ const Dashboard = {
                     </div>
                     ${snippet ? `<div class="card-snippet">${escapeHtml(snippet)}</div>` : ''}
                     <div class="card-footer">
-                        <span class="card-date">${dateStr} ${targetStr}</span>
+                        <span class="card-date">${dateStr}</span>
                         <span class="card-priority">${priority.emoji}</span>
                     </div>
                 </div>
