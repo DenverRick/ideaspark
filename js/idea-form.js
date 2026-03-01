@@ -125,9 +125,23 @@ const IdeaForm = {
         document.getElementById('summarize-video-btn').classList.add('hidden');
         document.getElementById('idea-reference-urls').value = '';
 
-        // Reset priority to Medium
-        const mediumRadio = document.querySelector('input[name="idea-priority"][value="Medium"]');
-        if (mediumRadio) mediumRadio.checked = true;
+        // Reset category pills — clear selection
+        this._selectCategoryPill('');
+    },
+
+    // Select a category pill by value (or clear selection if value is empty)
+    _selectCategoryPill(value) {
+        const pillsContainer = document.getElementById('idea-category-pills');
+        const hiddenInput = document.getElementById('idea-category');
+        if (!pillsContainer) return;
+        pillsContainer.querySelectorAll('.category-pill').forEach(p => {
+            const isMatch = p.dataset.value === value;
+            p.classList.toggle('selected', isMatch);
+            const color = getCategoryColor(p.dataset.value);
+            p.style.background = isMatch ? color : '';
+            p.style.color = isMatch ? 'white' : '';
+        });
+        if (hiddenInput) hiddenInput.value = value;
     },
 
     async loadIdea(recordId) {
@@ -137,16 +151,13 @@ const IdeaForm = {
 
             document.getElementById('idea-title').value = f.Title || '';
             document.getElementById('idea-youtube-url').value = f.YouTubeURL || '';
-            document.getElementById('idea-category').value = f.Category || '';
-            document.getElementById('idea-status').value = f.Status || 'Idea';
             document.getElementById('idea-target-date').value = f.TargetDate || '';
             document.getElementById('idea-thoughts').value = f.MyThoughts || '';
             document.getElementById('idea-reference-urls').value = f.ReferenceURLs || '';
             document.getElementById('idea-record-id').value = recordId;
 
-            // Priority radio
-            const priorityRadio = document.querySelector(`input[name="idea-priority"][value="${f.Priority || 'Medium'}"]`);
-            if (priorityRadio) priorityRadio.checked = true;
+            // Select the category pill
+            this._selectCategoryPill(f.Category || '');
 
             // Video metadata
             if (f.VideoTitle) {
@@ -404,11 +415,9 @@ ${transcriptText}`;
             return;
         }
         if (!category) {
-            showToast('Category is required', 'error');
+            showToast('Please select a category', 'error');
             return;
         }
-
-        const priority = document.querySelector('input[name="idea-priority"]:checked')?.value || 'Medium';
 
         const fields = {
             Title: title,
@@ -418,8 +427,8 @@ ${transcriptText}`;
             VideoChannel: document.getElementById('idea-video-channel').value || null,
             VideoDuration: document.getElementById('idea-video-duration').value || null,
             Category: category,
-            Status: document.getElementById('idea-status').value,
-            Priority: priority,
+            Status: 'Idea',
+            Priority: 'Medium',
             TargetDate: document.getElementById('idea-target-date').value || null,
             MyThoughts: document.getElementById('idea-thoughts').value || null,
             ReferenceURLs: document.getElementById('idea-reference-urls').value.trim() || null

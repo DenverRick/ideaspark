@@ -114,7 +114,7 @@ function hideLoading(container) {
     if (overlay) overlay.classList.remove('visible');
 }
 
-// Populate all category <select> elements dynamically
+// Populate all category selects and pill buttons dynamically
 function populateCategorySelects(categories) {
     // Dashboard filter — keep "All Categories" as first option
     const filterSel = document.getElementById('filter-category');
@@ -123,11 +123,34 @@ function populateCategorySelects(categories) {
         categories.forEach(cat => filterSel.add(new Option(cat, cat)));
     }
 
-    // Idea form — keep "Select..." placeholder as first option
-    const formSel = document.getElementById('idea-category');
-    if (formSel) {
-        while (formSel.options.length > 1) formSel.remove(1);
-        categories.forEach(cat => formSel.add(new Option(cat, cat)));
+    // Idea form pill selector
+    const pillsContainer = document.getElementById('idea-category-pills');
+    const hiddenCatInput = document.getElementById('idea-category');
+    if (pillsContainer) {
+        pillsContainer.innerHTML = '';
+        categories.forEach(cat => {
+            const color = getCategoryColor(cat);
+            const emoji = getCategoryEmoji(cat);
+            const pill = document.createElement('button');
+            pill.type = 'button';
+            pill.className = 'category-pill';
+            pill.dataset.value = cat;
+            pill.style.borderColor = color;
+            pill.innerHTML = `<span>${emoji}</span>${escapeHtml(cat)}`;
+            pill.addEventListener('click', () => {
+                // Deselect all, select this one
+                pillsContainer.querySelectorAll('.category-pill').forEach(p => {
+                    p.classList.remove('selected');
+                    p.style.background = '';
+                    p.style.color = '';
+                });
+                pill.classList.add('selected');
+                pill.style.background = color;
+                pill.style.color = 'white';
+                if (hiddenCatInput) hiddenCatInput.value = cat;
+            });
+            pillsContainer.appendChild(pill);
+        });
     }
 
     // Detail view inline select — no placeholder, just categories

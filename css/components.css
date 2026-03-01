@@ -1,5 +1,40 @@
 /* IdeaSpark - Component Styles */
 
+/* ========== Category Pill Selector ========== */
+.category-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.category-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 2px solid transparent;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.category-pill:active {
+    transform: scale(0.96);
+}
+
+.category-pill.selected {
+    color: white;
+    border-color: transparent;
+    font-weight: 600;
+}
+
 /* ========== Filter Bar ========== */
 .filter-bar {
     display: flex;
