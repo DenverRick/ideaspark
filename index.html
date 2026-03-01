@@ -7,9 +7,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💡</text></svg>">
     <title>IdeaSpark</title>
-    <link rel="stylesheet" href="css/main.css?v=11">
-    <link rel="stylesheet" href="css/components.css?v=11">
-    <link rel="stylesheet" href="css/mobile.css?v=11">
+    <link rel="stylesheet" href="css/main.css?v=12">
+    <link rel="stylesheet" href="css/components.css?v=12">
+    <link rel="stylesheet" href="css/mobile.css?v=12">
 </head>
 <body>
 
@@ -29,7 +29,7 @@
             <div class="form-group">
                 <label for="setup-airtable-token">Airtable Personal Access Token</label>
                 <input type="password" id="setup-airtable-token" placeholder="pat..." autocomplete="off">
-                <small><a href="https://airtable.com/create/tokens" target="_blank" rel="noopener">Get your token</a></small>
+                <small><a href="https://airtable.com/create/tokens" target="_blank" rel="noopener">Get your token</a> — Scopes needed: <code>data.records:read</code>, <code>data.records:write</code>, <code>schema.bases:read</code></small>
             </div>
             <div class="form-group">
                 <label for="setup-airtable-base">Airtable Base ID</label>
@@ -92,13 +92,6 @@
         </select>
         <select id="filter-category" class="filter-select">
             <option value="">All Categories</option>
-            <option value="Senior Geeks">Senior Geeks</option>
-            <option value="Pickleball">Pickleball</option>
-            <option value="Tennis">Tennis</option>
-            <option value="Singles Club">Singles Club</option>
-            <option value="Home Projects">Home Projects</option>
-            <option value="Web App Development">Web App Development</option>
-            <option value="General">General</option>
         </select>
         <select id="sort-select" class="filter-select">
             <option value="Created-desc">Newest First</option>
@@ -132,6 +125,7 @@
             <div class="form-group">
                 <label for="settings-airtable-token">Airtable Token</label>
                 <input type="password" id="settings-airtable-token" autocomplete="off">
+                <small>Scopes needed: <code>data.records:read</code>, <code>data.records:write</code>, <code>schema.bases:read</code></small>
             </div>
             <div class="form-group">
                 <label for="settings-airtable-base">Airtable Base ID</label>
@@ -217,13 +211,6 @@
                     <label for="idea-category">Category <span class="required">*</span></label>
                     <select id="idea-category" required>
                         <option value="">Select...</option>
-                        <option value="Senior Geeks">Senior Geeks</option>
-                        <option value="Pickleball">Pickleball</option>
-                        <option value="Tennis">Tennis</option>
-                        <option value="Singles Club">Singles Club</option>
-                        <option value="Home Projects">Home Projects</option>
-                        <option value="Web App Development">Web App Development</option>
-                        <option value="General">General</option>
                     </select>
                 </div>
                 <div class="form-group form-half">
@@ -357,13 +344,6 @@
                 <div class="detail-meta-row">
                     <span class="detail-label">Category</span>
                     <select id="detail-category" class="inline-select">
-                        <option value="Senior Geeks">Senior Geeks</option>
-                        <option value="Pickleball">Pickleball</option>
-                        <option value="Tennis">Tennis</option>
-                        <option value="Singles Club">Singles Club</option>
-                        <option value="Home Projects">Home Projects</option>
-                        <option value="Web App Development">Web App Development</option>
-                        <option value="General">General</option>
                     </select>
                 </div>
                 <div class="detail-meta-row">
@@ -503,18 +483,18 @@
 <div id="toast" class="toast"></div>
 
 <!-- Scripts (dependency order) -->
-<script src="js/config.js?v=11"></script>
-<script src="js/utils.js?v=11"></script>
-<script src="js/airtable.js?v=11"></script>
-<script src="js/youtube.js?v=11"></script>
-<script src="js/claude.js?v=11"></script>
-<script src="js/gemini.js?v=11"></script>
-<script src="js/speech.js?v=11"></script>
-<script src="js/dashboard.js?v=11"></script>
-<script src="js/idea-form.js?v=11"></script>
-<script src="js/brainstorm.js?v=11"></script>
-<script src="js/action-steps.js?v=11"></script>
-<script src="js/app.js?v=11"></script>
+<script src="js/config.js?v=12"></script>
+<script src="js/utils.js?v=12"></script>
+<script src="js/airtable.js?v=12"></script>
+<script src="js/youtube.js?v=12"></script>
+<script src="js/claude.js?v=12"></script>
+<script src="js/gemini.js?v=12"></script>
+<script src="js/speech.js?v=12"></script>
+<script src="js/dashboard.js?v=12"></script>
+<script src="js/idea-form.js?v=12"></script>
+<script src="js/brainstorm.js?v=12"></script>
+<script src="js/action-steps.js?v=12"></script>
+<script src="js/app.js?v=12"></script>
 
 </body>
 </html>

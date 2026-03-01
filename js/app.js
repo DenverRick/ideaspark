@@ -676,6 +676,8 @@ const Setup = {
         if (result.valid) {
             statusEl.textContent = 'Connected! Loading your ideas...';
             statusEl.className = 'setup-status success';
+            // Fetch dynamic categories for this user's base
+            refreshCategories();
             setTimeout(() => Dashboard.show(), 500);
         } else {
             statusEl.textContent = `Connection failed: ${result.error}. Please check your Airtable token and Base ID.`;
@@ -703,8 +705,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Route to setup or dashboard
     if (hasValidConfig()) {
+        // Populate selects immediately from cache (fast, no flicker)
+        populateCategorySelects(getCategories());
+        // Fetch fresh categories from Airtable in background
+        refreshCategories();
         Dashboard.show();
     } else {
+        // Still populate with defaults so the form works on setup screen
+        populateCategorySelects(getCategories());
         Setup.show();
     }
 });

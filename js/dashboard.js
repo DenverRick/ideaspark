@@ -123,7 +123,7 @@ const Dashboard = {
 
     _cardHTML(record) {
         const f = record.fields;
-        const categoryColor = AppConfig.CATEGORIES[f.Category] || '#808080';
+        const categoryColor = getCategoryColor(f.Category);
         const statusColor = AppConfig.STATUSES[f.Status] || '#6C757D';
         const priority = AppConfig.PRIORITIES[f.Priority] || AppConfig.PRIORITIES.Medium;
 
@@ -131,17 +131,7 @@ const Dashboard = {
         if (f.VideoThumbnail) {
             thumbHTML = `<img class="card-thumb" src="${escapeHtml(f.VideoThumbnail)}" alt="" loading="lazy">`;
         } else {
-            // Category-specific placeholder with color + emoji
-            const catEmojis = {
-                'Senior Geeks': '💻',
-                'Pickleball': '🏓',
-                'Tennis': '🎾',
-                'Singles Club': '🥂',
-                'Home Projects': '🔨',
-                'Web App Development': '🌐',
-                'General': '💡'
-            };
-            const emoji = catEmojis[f.Category] || '💡';
+            const emoji = getCategoryEmoji(f.Category);
             thumbHTML = `<div class="card-thumb-placeholder" style="background:${categoryColor}">${emoji}</div>`;
         }
 
@@ -203,6 +193,8 @@ const Dashboard = {
         saveApiKeys(keys);
         document.getElementById('settings-modal').classList.remove('active');
         showToast('Settings updated!', 'success');
+        // Re-fetch categories for the (possibly new) base
+        refreshCategories();
         this.loadIdeas();
     },
 

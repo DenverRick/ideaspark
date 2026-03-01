@@ -114,6 +114,48 @@ function hideLoading(container) {
     if (overlay) overlay.classList.remove('visible');
 }
 
+// Populate all category <select> elements dynamically
+function populateCategorySelects(categories) {
+    // Dashboard filter — keep "All Categories" as first option
+    const filterSel = document.getElementById('filter-category');
+    if (filterSel) {
+        while (filterSel.options.length > 1) filterSel.remove(1);
+        categories.forEach(cat => filterSel.add(new Option(cat, cat)));
+    }
+
+    // Idea form — keep "Select..." placeholder as first option
+    const formSel = document.getElementById('idea-category');
+    if (formSel) {
+        while (formSel.options.length > 1) formSel.remove(1);
+        categories.forEach(cat => formSel.add(new Option(cat, cat)));
+    }
+
+    // Detail view inline select — no placeholder, just categories
+    const detailSel = document.getElementById('detail-category');
+    if (detailSel) {
+        // Preserve current value to re-select after repopulating
+        const currentVal = detailSel.value;
+        detailSel.innerHTML = '';
+        categories.forEach(cat => detailSel.add(new Option(cat, cat)));
+        if (currentVal) detailSel.value = currentVal;
+    }
+}
+
+// Fetch fresh categories from Airtable and update all selects + cache
+function refreshCategories() {
+    AirtableAPI.fetchCategories()
+        .then(cats => {
+            saveCategories(cats);
+            populateCategorySelects(cats);
+        })
+        .catch(err => {
+            console.warn('Could not fetch categories from Airtable:', err.message);
+            if (err.message.includes('403') || err.message.includes('401')) {
+                showToast('Add "schema.bases:read" scope to your Airtable token for dynamic categories', 'info');
+            }
+        });
+}
+
 // Current idea state (shared across tabs)
 let currentIdeaId = null;
 let currentIdeaData = null;

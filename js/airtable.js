@@ -243,5 +243,24 @@ const AirtableAPI = {
         } catch (error) {
             return { valid: false, error: error.message };
         }
+    },
+
+    // Fetch Category field options from Airtable schema (requires schema.bases:read scope)
+    async fetchCategories() {
+        const { airtableToken, airtableBaseId } = getApiKeys();
+        const url = `https://api.airtable.com/v0/meta/bases/${airtableBaseId}/tables`;
+        const response = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${airtableToken}` }
+        });
+        if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            throw new Error(`Schema fetch failed: ${response.status}${err.error?.message ? ' — ' + err.error.message : ''}`);
+        }
+        const data = await response.json();
+        const ideasTable = data.tables.find(t => t.name === AppConfig.TABLE_NAMES.IDEAS);
+        if (!ideasTable) throw new Error('IDEAS table not found in schema');
+        const categoryField = ideasTable.fields.find(f => f.name === 'Category');
+        if (!categoryField?.options?.choices?.length) throw new Error('Category field not found or has no options');
+        return categoryField.options.choices.map(c => c.name);
     }
 };
