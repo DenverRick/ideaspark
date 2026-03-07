@@ -4,7 +4,8 @@ about: Suggest a new feature or improvement
 title: "[FEATURE] "
 labels: enhancement
 assignees: DenverRick
----[FEATURE]
+---
+[FEATURE]
 What problem does this solve?
 Describe the feature you’d like
 Who would benefit from this?
