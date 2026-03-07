@@ -4,7 +4,8 @@ about: Report a problem so we can fix it
 title: "[BUG] "
 labels: bug
 assignees: DenverRick
----[BUG]
+---
+[BUG]
 What happened?
 What did you expect to happen?
 Steps to reproduce
