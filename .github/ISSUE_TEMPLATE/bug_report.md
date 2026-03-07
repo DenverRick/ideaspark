@@ -5,6 +5,13 @@ title: "[BUG] "
 labels: bug
 assignees: DenverRick
 ---
+---
+name: 🐛 Bug Report
+about: Report a problem so we can fix it
+title: "[BUG] "
+labels: bug
+assignees: DenverRick
+---
 [BUG]
 What happened?
 What did you expect to happen?
